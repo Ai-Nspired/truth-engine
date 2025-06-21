@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Truth Engine Admin Console</title>
+  <style>
+    :root {
+      --truth-black: #010b14;
+      --truth-dark: #0a1723;
+      --truth-accent: #0055ff;
+      --truth-accent-light: #0cf;
+      --truth-highlight: #5a8bff;
+      --truth-positive: #00ff8c;
+      --truth-warning: #ff5050;
+      --truth-border: rgba(0, 71, 171, 0.5);
+    }
+    
+    body {
+      background-color: var(--truth-black);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(10, 23, 35, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--truth-border);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      padding: 25px;
+    }
+    
+    h2 {
+      color: var(--truth-accent-light);
+      margin-top: 0;
+    }
+    
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 500;
+      color: var(--truth-highlight);
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      background: rgba(30, 30, 40, 0.6);
+      color: white;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      margin-top: 15px;
+      background: var(--truth-accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background: #0066ff;
+    }
+    
+    .status-message {
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(30, 30, 40, 0.6);
+      border-radius: 4px;
+      color: var(--truth-highlight);
+    }
+    
+    /* Make textarea resizable with a smaller minimum height */
+    textarea#answer {
+      width: 100%;
+      min-height: 50px; /* Reduced from 300px to allow smaller sizing */
+      padding: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      background: rgba(30, 30, 40, 0.6);
+      color: white;
+      resize: vertical; /* Allow vertical resizing */
+      box-sizing: border-box;
+    }
+    
+    /* Make the preview div resizable with a smaller minimum height */
+    .preview {
+      width: 100%;
+      min-height: 50px; /* Reduced from 300px to allow smaller sizing */
+      padding: 15px;
+      margin-top: 10px;
+      background: rgba(20, 30, 45, 0.7);
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      color: white;
+      overflow-y: auto;
+      resize: vertical; /* Allow vertical resizing */
+      box-sizing: border-box;
+    }
+    
+    /* Preview content styling */
+    .preview h1, .preview h2, .preview h3 {
+      color: var(--truth-accent-light);
+    }
+    
+    .preview code {
+      background: rgba(0, 10, 20, 0.5);
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: var(--truth-accent-light);
+    }
+    
+    .preview pre {
+      background: rgba(0, 10, 20, 0.5);
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      border-left: 3px solid var(--truth-accent);
+    }
+    
+    .content-length {
+      color: var(--truth-highlight);
+      font-size: 0.9em;
+      margin-top: 8px;
+    }
+    
+    .warning {
+      color: var(--truth-warning);
+    }
+    
+    .citations-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .admin-footer {
+      text-align: center;
+      margin-top: 30px;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 12px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <h2>Truth Engine Admin Console</h2>
+    
+    <label for="query">Query (exact):</label>
+    <input type="text" id="query" placeholder="e.g. what is this?">
+    <button id="loadBtn">Load</button>
+    <div id="loadMsg" class="status-message"></div>
+    
+    <label for="answer">Answer (Markdown supported):</label>
+    <textarea id="answer"></textarea>
+    
+    <label>Citations (up to 2):</label>
+    <div class="citations-container">
+      <input type="text" placeholder="Title" class="citation-title">
+      <input type="text" placeholder="URL" class="citation-url">
+      <input type="text" placeholder="Title" class="citation-title">
+      <input type="text" placeholder="URL" class="citation-url">
+    </div>
+    
+    <label for="editor">Your Name (for audit):</label>
+    <input type="text" id="editor" placeholder="admin">
+    
+    <button id="saveBtn">Save</button>
+    <div id="saveMsg" class="status-message"></div>
+    
+    <label>Preview:</label>
+    <div class="preview" id="preview"></div>
+    <div class="content-length" id="contentLength">Character count: 0</div>
+    
+    <div class="admin-footer">© 2025 truth-network admin console</div>
+  </div>
+  
+  <script>
+    const API_BASE = "https://justice.ai-n.workers.dev"; // Updated to point to the correct worker URL
+    const queryInput = document.getElementById('query');
+    const answerInput = document.getElementById('answer');
+    const editorInput = document.getElementById('editor');
+    const loadBtn = document.getElementById('loadBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const loadMsg = document.getElementById('loadMsg');
+    const saveMsg = document.getElementById('saveMsg');
+    const previewDiv = document.getElementById('preview');
+    const citationTitles = document.querySelectorAll('.citation-title');
+    const citationUrls = document.querySelectorAll('.citation-url');
+
+    // Live preview with character count
+    answerInput.addEventListener('input', () => {
+      const content = answerInput.value || '';
+      previewDiv.innerHTML = marked.parse(content);
+      
+      // Update character count
+      const charCount = content.length;
+      const contentLengthDiv = document.getElementById('contentLength');
+      contentLengthDiv.textContent = `Character count: ${charCount}`;
+      
+      // Add warning if very long
+      if (charCount > 8000) {
+        contentLengthDiv.classList.add('warning');
+        contentLengthDiv.textContent += " (Very long content may be truncated in some systems)";
+      } else {
+        contentLengthDiv.classList.remove('warning');
+      }
+    });
+
+    // Load existing answer
+    loadBtn.onclick = async () => {
+      loadMsg.textContent = '';
+      saveMsg.textContent = '';
+      answerInput.value = '';
+      previewDiv.innerHTML = '';
+      citationTitles.forEach(e => e.value = '');
+      citationUrls.forEach(e => e.value = '');
+
+      const query = queryInput.value.trim();
+      if (!query) {
+        loadMsg.textContent = "Enter a query.";
+        return;
+      }
+      loadMsg.textContent = "Loading...";
+      try {
+        const resp = await fetch(`${API_BASE}/api/ai/truth`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+        const data = await resp.json();
+        if (data.answer) {
+          answerInput.value = data.answer;
+          previewDiv.innerHTML = marked.parse(data.answer);
+          
+          // Update character count
+          const charCount = data.answer.length;
+          const contentLengthDiv = document.getElementById('contentLength');
+          contentLengthDiv.textContent = `Character count: ${charCount}`;
+          
+          if (data.citations && Array.isArray(data.citations)) {
+            data.citations.slice(0,2).forEach((c, i) => {
+              citationTitles[i].value = c.title || '';
+              citationUrls[i].value = c.url || '';
+            });
+          }
+          loadMsg.textContent = data.edited ? `Loaded (edited by ${data.lastEditedBy || "unknown"})` : "Loaded (AI generated)";
+        } else {
+          loadMsg.textContent = "No answer found. You can create one.";
+        }
+      } catch (e) {
+        loadMsg.textContent = "Error loading: " + e;
+      }
+    };
+
+    // Save edited answer
+    saveBtn.onclick = async () => {
+      saveMsg.textContent = '';
+      const query = queryInput.value.trim();
+      const newAnswer = answerInput.value; // Don't trim() to preserve whitespace
+      const editor = editorInput.value.trim() || "admin";
+      const citations = [];
+      for (let i = 0; i < 2; ++i) {
+        const title = citationTitles[i].value.trim();
+        const url = citationUrls[i].value.trim();
+        if (title && url) citations.push({ title, url });
+      }
+      if (!query || !newAnswer) {
+        saveMsg.textContent = "Query and answer required.";
+        return;
+      }
+      saveMsg.textContent = "Saving...";
+      try {
+        console.log(`Sending ${newAnswer.length} characters to API`);
+        
+        const resp = await fetch(`${API_BASE}/api/ai/edit-truth`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            truthId: "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-'), 
+            newText: newAnswer,
+            editor,
+            citations
+          })
+        });
+        if (resp.ok) {
+          saveMsg.textContent = `Saved! (${newAnswer.length} characters)`;
+        } else {
+          const errorText = await resp.text();
+          saveMsg.textContent = `Save failed: ${resp.status} - ${errorText}`;
+        }
+      } catch (e) {
+        saveMsg.textContent = "Error saving: " + e;
+      }
+    };
+  </script>
+</body>
+</html>
