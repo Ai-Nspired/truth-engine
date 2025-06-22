@@ -14,7 +14,6 @@
       --truth-warning: #ff5050;
       --truth-border: rgba(0, 71, 171, 0.5);
     }
-    
     body {
       background-color: var(--truth-black);
       color: #ffffff;
@@ -22,7 +21,6 @@
       margin: 0;
       padding: 20px;
     }
-    
     .admin-container {
       max-width: 800px;
       margin: 0 auto;
@@ -33,19 +31,16 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       padding: 25px;
     }
-    
     h2 {
       color: var(--truth-accent-light);
       margin-top: 0;
     }
-    
     label {
       display: block;
       margin: 15px 0 5px;
       font-weight: 500;
       color: var(--truth-highlight);
     }
-    
     input[type="text"] {
       width: 100%;
       padding: 10px;
@@ -56,7 +51,6 @@
       font-size: 14px;
       box-sizing: border-box;
     }
-    
     button {
       margin-top: 15px;
       background: var(--truth-accent);
@@ -67,11 +61,9 @@
       font-size: 14px;
       cursor: pointer;
     }
-    
     button:hover {
       background: #0066ff;
     }
-    
     .status-message {
       margin: 15px 0;
       padding: 10px;
@@ -79,11 +71,9 @@
       border-radius: 4px;
       color: var(--truth-highlight);
     }
-    
-    /* Make textarea resizable with a smaller minimum height */
     textarea#answer {
       width: 100%;
-      min-height: 50px; /* Reduced from 300px to allow smaller sizing */
+      min-height: 50px;
       padding: 10px;
       font-family: monospace;
       white-space: pre-wrap;
@@ -92,14 +82,12 @@
       border-radius: 4px;
       background: rgba(30, 30, 40, 0.6);
       color: white;
-      resize: vertical; /* Allow vertical resizing */
+      resize: vertical;
       box-sizing: border-box;
     }
-    
-    /* Make the preview div resizable with a smaller minimum height */
     .preview {
       width: 100%;
-      min-height: 50px; /* Reduced from 300px to allow smaller sizing */
+      min-height: 50px;
       padding: 15px;
       margin-top: 10px;
       background: rgba(20, 30, 45, 0.7);
@@ -107,15 +95,12 @@
       border-radius: 4px;
       color: white;
       overflow-y: auto;
-      resize: vertical; /* Allow vertical resizing */
+      resize: vertical;
       box-sizing: border-box;
     }
-    
-    /* Preview content styling */
     .preview h1, .preview h2, .preview h3 {
       color: var(--truth-accent-light);
     }
-    
     .preview code {
       background: rgba(0, 10, 20, 0.5);
       padding: 2px 5px;
@@ -123,7 +108,6 @@
       font-family: monospace;
       color: var(--truth-accent-light);
     }
-    
     .preview pre {
       background: rgba(0, 10, 20, 0.5);
       padding: 10px;
@@ -131,45 +115,95 @@
       overflow-x: auto;
       border-left: 3px solid var(--truth-accent);
     }
-    
     .content-length {
       color: var(--truth-highlight);
       font-size: 0.9em;
       margin-top: 8px;
     }
-    
     .warning {
       color: var(--truth-warning);
     }
-    
     .citations-container {
       display: grid;
       grid-template-columns: 1fr 2fr;
       gap: 10px;
       margin: 15px 0;
     }
-    
     .admin-footer {
       text-align: center;
       margin-top: 30px;
       color: rgba(255, 255, 255, 0.3);
       font-size: 12px;
     }
+    /* Piano lock styles */
+    #melody-lock {
+      max-width:800px;
+      margin:30px auto 0;
+      background:#101b2e;
+      border-radius:8px;
+      padding:24px 16px 22px 16px;
+      text-align:center;
+    }
+    #melody-piano {
+      margin-bottom: 10px;
+    }
+    #melody-bar {
+      min-height: 20px;
+      margin:0.7em 0;
+      font-family: monospace;
+      color: #00ff8c;
+      letter-spacing: 2px;
+    }
+    .import-group {
+      margin: 0.8em 0;
+    }
+    .import-group input[type="text"] {
+      width: 200px;
+      font-size: 1em;
+      margin-right: 5px;
+      padding: 6px;
+    }
+    .import-group button {
+      padding: 6px 12px;
+      font-size: 1em;
+      margin-left: 2px;
+      margin-top: 0;
+    }
+    @media (max-width: 600px) {
+      #melody-bar { font-size: 0.85em; }
+      .import-group input[type="text"] { width: 100px; }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+  <!-- Melody Lock Gate (hash: e4a25ba5b1c66941) -->
+  <div id="melody-lock">
+    <h2 style="color:#00eaff;">Admin Melody Lock</h2>
+    <div id="melody-piano"></div>
+    <div>
+      <button id="melody-clear">Clear Melody</button>
+      <button id="melody-unlock">Unlock Admin</button>
+    </div>
+    <div id="melody-bar"></div>
+    <div class="import-group">
+      <input type="text" id="importMelodyInput" placeholder="Import pattern (e.g. 40-43-45)">
+      <button id="importMelodyBtn">Import</button>
+    </div>
+    <div id="melody-status" style="font-weight:bold;color:#ff5050;"></div>
+    <div style="color:#8aafff;font-size:0.9em;margin-top:10px;">
+      Play your secret melody <b>or</b> import the pattern, then click <b>Unlock Admin</b>
+    </div>
+  </div>
+  <!-- Admin UI -->
   <div class="admin-container">
     <h2>Truth Engine Admin Console</h2>
-    
     <label for="query">Query (exact):</label>
     <input type="text" id="query" placeholder="e.g. what is this?">
     <button id="loadBtn">Load</button>
     <div id="loadMsg" class="status-message"></div>
-    
     <label for="answer">Answer (Markdown supported):</label>
     <textarea id="answer"></textarea>
-    
     <label>Citations (up to 2):</label>
     <div class="citations-container">
       <input type="text" placeholder="Title" class="citation-title">
@@ -177,22 +211,93 @@
       <input type="text" placeholder="Title" class="citation-title">
       <input type="text" placeholder="URL" class="citation-url">
     </div>
-    
     <label for="editor">Your Name (for audit):</label>
     <input type="text" id="editor" placeholder="admin">
-    
     <button id="saveBtn">Save</button>
     <div id="saveMsg" class="status-message"></div>
-    
     <label>Preview:</label>
     <div class="preview" id="preview"></div>
     <div class="content-length" id="contentLength">Character count: 0</div>
-    
     <div class="admin-footer">© 2025 truth-network admin console</div>
   </div>
-  
   <script>
-    const API_BASE = "https://justice.ai-n.workers.dev"; // Updated to point to the correct worker URL
+    // --- Melody Lock Script ---
+    // Melody hash: e4a25ba5b1c66941
+    const allowedMelodyHash = "e4a25ba5b1c66941";
+    let melody = [];
+    function renderPiano() {
+      // Octave C4-B4 (60-71)
+      const notes = [60,62,64,65,67,69,71];
+      const names = ['C','D','E','F','G','A','B'];
+      let html = '<div style="display:flex;justify-content:center;">';
+      for (let i=0; i<notes.length; ++i) {
+        html += `<div data-note="${notes[i]}" style="width:40px;height:120px;margin:1px;background:#fff;border-radius:0 0 6px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-size:0.95em;cursor:pointer;border:1px solid #3377ff;"><span style="margin-bottom:6px;">${names[i]}</span></div>`;
+      }
+      html += '</div>';
+      document.getElementById('melody-piano').innerHTML = html;
+      document.querySelectorAll('#melody-piano [data-note]').forEach(el=>{
+        el.onclick = ()=>{
+          playNote(+el.dataset.note);
+          melody.push(+el.dataset.note);
+          updateMelodyBar();
+        };
+      });
+    }
+    function playNote(midi) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const freq = 440 * Math.pow(2, (midi-69)/12);
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.11, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.23);
+      o.connect(g).connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + 0.25);
+      o.onended = ()=>ctx.close();
+    }
+    function updateMelodyBar() {
+      document.getElementById('melody-bar').textContent = melody.map(m=>noteName(m)).join(' ');
+    }
+    function noteName(midi) {
+      const n=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+      return n[midi%12]+Math.floor(midi/12-1);
+    }
+    document.getElementById('melody-clear').onclick = ()=>{
+      melody=[];
+      updateMelodyBar();
+      document.getElementById('melody-status').textContent = '';
+    };
+    document.getElementById('melody-unlock').onclick = async ()=>{
+      if (!melody.length) { document.getElementById('melody-status').textContent = 'Play or import your melody!'; return; }
+      // Only use the first 8 bytes of the hash (as in your hash)
+      const bytes = new Uint8Array(melody);
+      const hashBuf = await window.crypto.subtle.digest('SHA-256', bytes);
+      const hashFull = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+      const hash = hashFull.slice(0,16); // Only the first 8 bytes (16 hex chars)
+      if (hash === allowedMelodyHash) {
+        document.getElementById('melody-lock').style.display = 'none';
+        document.querySelector('.admin-container').style.display = '';
+      } else {
+        document.getElementById('melody-status').textContent = 'Incorrect melody, try again.';
+      }
+    };
+    // Import melody pattern
+    document.getElementById('importMelodyBtn').onclick = function() {
+      const pat = document.getElementById('importMelodyInput').value.trim();
+      if (!pat) return;
+      melody = pat.split('-').map(x=>parseInt(x,36)).filter(x=>!isNaN(x));
+      updateMelodyBar();
+      document.getElementById('melody-status').textContent = '';
+    };
+    // Hide admin until unlocked
+    document.querySelector('.admin-container').style.display = 'none';
+    renderPiano();
+    // --- End Melody Lock Script ---
+
+    // --- Truth Engine Admin Logic ---
+    const API_BASE = "https://justice.ai-n.workers.dev";
     const queryInput = document.getElementById('query');
     const answerInput = document.getElementById('answer');
     const editorInput = document.getElementById('editor');
@@ -203,18 +308,12 @@
     const previewDiv = document.getElementById('preview');
     const citationTitles = document.querySelectorAll('.citation-title');
     const citationUrls = document.querySelectorAll('.citation-url');
-
-    // Live preview with character count
     answerInput.addEventListener('input', () => {
       const content = answerInput.value || '';
       previewDiv.innerHTML = marked.parse(content);
-      
-      // Update character count
       const charCount = content.length;
       const contentLengthDiv = document.getElementById('contentLength');
       contentLengthDiv.textContent = `Character count: ${charCount}`;
-      
-      // Add warning if very long
       if (charCount > 8000) {
         contentLengthDiv.classList.add('warning');
         contentLengthDiv.textContent += " (Very long content may be truncated in some systems)";
@@ -222,7 +321,6 @@
         contentLengthDiv.classList.remove('warning');
       }
     });
-
     // Load existing answer
     loadBtn.onclick = async () => {
       loadMsg.textContent = '';
@@ -231,7 +329,6 @@
       previewDiv.innerHTML = '';
       citationTitles.forEach(e => e.value = '');
       citationUrls.forEach(e => e.value = '');
-
       const query = queryInput.value.trim();
       if (!query) {
         loadMsg.textContent = "Enter a query.";
@@ -248,12 +345,9 @@
         if (data.answer) {
           answerInput.value = data.answer;
           previewDiv.innerHTML = marked.parse(data.answer);
-          
-          // Update character count
           const charCount = data.answer.length;
           const contentLengthDiv = document.getElementById('contentLength');
           contentLengthDiv.textContent = `Character count: ${charCount}`;
-          
           if (data.citations && Array.isArray(data.citations)) {
             data.citations.slice(0,2).forEach((c, i) => {
               citationTitles[i].value = c.title || '';
@@ -268,12 +362,11 @@
         loadMsg.textContent = "Error loading: " + e;
       }
     };
-
     // Save edited answer
     saveBtn.onclick = async () => {
       saveMsg.textContent = '';
       const query = queryInput.value.trim();
-      const newAnswer = answerInput.value; // Don't trim() to preserve whitespace
+      const newAnswer = answerInput.value;
       const editor = editorInput.value.trim() || "admin";
       const citations = [];
       for (let i = 0; i < 2; ++i) {
@@ -287,13 +380,11 @@
       }
       saveMsg.textContent = "Saving...";
       try {
-        console.log(`Sending ${newAnswer.length} characters to API`);
-        
         const resp = await fetch(`${API_BASE}/api/ai/edit-truth`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            truthId: "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-'), 
+          body: JSON.stringify({
+            truthId: "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-'),
             newText: newAnswer,
             editor,
             citations
