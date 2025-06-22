@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Truth Engine Admin Console</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
     :root {
       --truth-black: #010b14;
@@ -14,247 +13,112 @@
       --truth-positive: #00ff8c;
       --truth-warning: #ff5050;
       --truth-border: rgba(0, 71, 171, 0.5);
-      --glass-blur: blur(16px);
-      --glass-alpha: 0.62;
-      --melody-note: #00eaff;
-      --melody-note-active: #ffe600;
-    }
-    html,body {
-      background: linear-gradient(135deg, #101b2e 0%, #182846 100%);
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
     }
     body {
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-      color: white;
-      min-height: 100vh;
-    }
-    .glasscard {
-      background: rgba(10,23,35,var(--glass-alpha));
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.20), 0 1.5px 8px 0 #0032aa33;
-      backdrop-filter: var(--glass-blur);
-      padding: 35px 18px 30px 18px;
-      margin: 40px auto 24px auto;
-      max-width: 480px;
-      text-align: center;
-      border: 1px solid var(--truth-border);
-      animation: fadein 0.9s cubic-bezier(.2,1.1,.6,.98);
-    }
-    @keyframes fadein {
-      from { opacity: 0; transform: translateY(32px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .glasscard h2 {
-      margin-top: 0;
-      color: var(--truth-accent-light);
-      font-weight: 700;
-      font-size: 1.65em;
-      letter-spacing: 0.04em;
-    }
-    .melody-instructions {
-      background: rgba(0,90,255,0.09);
-      color: #afe9ff;
-      font-size: 1.08em;
-      border-radius: 7px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      margin-top: 10px;
-      border-left: 4px solid var(--truth-accent-light);
-      text-align: left;
-      max-width: 420px;
-      margin-left: auto; margin-right: auto;
-    }
-    #melody-piano {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin: 16px 0 7px 0;
-      flex-wrap: wrap;
-    }
-    .melody-key {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(145deg,#eaf6ff 70%,#b4e2fa 100%);
-      box-shadow: 0 2px 8px #0032a922;
-      border: 2.3px solid #3377ff;
-      color: #222;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.13em;
-      cursor: pointer;
-      transition: background 0.16s, box-shadow 0.09s, transform 0.08s;
-      user-select: none;
-      margin: 0 2px;
-    }
-    .melody-key.active, .melody-key:active {
-      background: var(--melody-note-active);
-      box-shadow: 0 0 0 3px #0055ff44;
-      color: #0055ff;
-      transform: scale(1.08);
-    }
-    #melody-bar {
-      margin: 10px 0 10px 0;
-      min-height: 22px;
-    }
-    .melody-pill {
-      display: inline-block;
-      background: var(--melody-note);
-      color: #014;
-      font-weight: 700;
-      font-size: 1em;
-      padding: 3px 10px;
-      border-radius: 18px;
-      margin: 0 2px;
-      margin-bottom: 2px;
-      box-shadow: 0 1px 5px #00eaff33;
-      transition: background 0.15s;
-    }
-    .melody-pill.active {
-      background: var(--melody-note-active);
-      color: #0055ff;
-    }
-    .import-group {
-      margin: 0.8em 0 0.5em 0;
-    }
-    .import-group input[type="text"] {
-      width: 140px;
-      font-size: 1em;
-      margin-right: 5px;
-      padding: 7px 8px;
-      border-radius: 6px;
-      border: 1.5px solid #00eaff88;
-      outline: none;
-      background: #111b2c;
-      color: #fff;
-    }
-    .import-group button {
-      padding: 7px 15px;
-      font-size: 1em;
-      margin-left: 2px;
-      margin-top: 0;
-      border-radius: 6px;
-      background: var(--truth-accent-light);
-      color: #011;
-      border: none;
-      font-weight: 500;
-      transition: background 0.15s;
-    }
-    .import-group button:hover { background: #00aaff; }
-    .melody-btns button {
-      margin-top: 8px;
-      margin-right: 8px;
-      border-radius: 6px;
-      padding: 9px 18px;
-      background: linear-gradient(90deg, #00eaff 0%, #3377ff 100%);
-      color: #011;
-      font-size: 1.09em;
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 2px 8px #0032aa19;
-      transition: background 0.15s, color 0.09s;
-    }
-    .melody-btns button:last-child { margin-right: 0;}
-    .melody-btns button:hover { background: #00aaff; color: #fff;}
-    #melody-status {
-      font-weight: bold;
-      margin-top: 10px;
-      min-height: 22px;
-      color: var(--truth-warning);
-      letter-spacing: 0.02em;
+      background-color: var(--truth-black);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
     }
     .admin-container {
       max-width: 800px;
       margin: 0 auto;
-      background: rgba(10, 23, 35, 0.90);
+      background: rgba(10, 23, 35, 0.85);
       backdrop-filter: blur(10px);
-      border: 1.5px solid var(--truth-border);
-      border-radius: 18px;
-      box-shadow: 0 10px 32px rgba(0,0,0,0.23);
-      padding: 28px 28px 18px 28px;
-      margin-bottom: 24px;
-      display: none;
-      animation: fadein 0.9s cubic-bezier(.2,1.1,.6,.98);
+      border: 1px solid var(--truth-border);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      padding: 25px;
     }
-    .admin-container h2 {
-      margin-top: 0;
-      font-size: 1.45em;
+    h2 {
       color: var(--truth-accent-light);
-      letter-spacing: 0.04em;
+      margin-top: 0;
     }
     label {
       display: block;
-      margin-top: 20px;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #88c6ff;
-      font-size: 1.07em;
-      letter-spacing: 0.01em;
+      margin: 15px 0 5px;
+      font-weight: 500;
+      color: var(--truth-highlight);
     }
-    input[type="text"], textarea#answer {
+    input[type="text"] {
       width: 100%;
-      padding: 12px 12px;
-      border: 1.5px solid #3377ff44;
-      border-radius: 7px;
-      background: #17223a;
-      color: #e5f7ff;
-      font-size: 1em;
+      padding: 10px;
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      background: rgba(30, 30, 40, 0.6);
+      color: white;
+      font-size: 14px;
       box-sizing: border-box;
-      margin-bottom: 3px;
-      outline: none;
-      transition: border 0.15s;
-    }
-    input[type="text"]:focus, textarea#answer:focus {
-      border: 2px solid #00eaff;
-      background: #111b2c;
     }
     button {
-      margin-top: 16px;
-      background: linear-gradient(90deg,#0055ff 40%,#0cf 100%);
+      margin-top: 15px;
+      background: var(--truth-accent);
       color: white;
       border: none;
-      border-radius: 7px;
-      padding: 11px 28px;
-      font-size: 1em;
-      font-weight: 600;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 2px 8px #0032aa23;
-      transition: background 0.15s, color 0.09s;
     }
     button:hover {
-      background: linear-gradient(90deg,#0cf 40%,#0055ff 100%);
-      color: #fff;
+      background: #0066ff;
     }
     .status-message {
-      margin: 15px 0 6px 0;
-      padding: 9px 13px;
-      background: #1c2e4a;
-      border-radius: 5px;
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(30, 30, 40, 0.6);
+      border-radius: 4px;
       color: var(--truth-highlight);
-      font-size: 1.01em;
+    }
+    textarea#answer {
+      width: 100%;
+      min-height: 50px;
+      padding: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      background: rgba(30, 30, 40, 0.6);
+      color: white;
+      resize: vertical;
+      box-sizing: border-box;
     }
     .preview {
       width: 100%;
       min-height: 50px;
-      padding: 18px;
-      margin-top: 12px;
-      background: linear-gradient(95deg,#111b2c 60%,#192a4b 100%);
-      border: 1.5px solid #3377ff33;
-      border-radius: 9px;
-      color: #f6faff;
-      font-size: 1.09em;
+      padding: 15px;
+      margin-top: 10px;
+      background: rgba(20, 30, 45, 0.7);
+      border: 1px solid var(--truth-border);
+      border-radius: 4px;
+      color: white;
       overflow-y: auto;
-      box-shadow: 0 2px 13px #001b2a0c;
-      transition: background 0.15s;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .preview h1, .preview h2, .preview h3 {
+      color: var(--truth-accent-light);
+    }
+    .preview code {
+      background: rgba(0, 10, 20, 0.5);
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: var(--truth-accent-light);
+    }
+    .preview pre {
+      background: rgba(0, 10, 20, 0.5);
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      border-left: 3px solid var(--truth-accent);
     }
     .content-length {
       color: var(--truth-highlight);
-      font-size: 0.93em;
+      font-size: 0.9em;
       margin-top: 8px;
-      text-align: right;
-      opacity: 0.75;
     }
     .warning {
       color: var(--truth-warning);
@@ -263,51 +127,75 @@
       display: grid;
       grid-template-columns: 1fr 2fr;
       gap: 10px;
-      margin: 12px 0 0 0;
+      margin: 15px 0;
     }
     .admin-footer {
       text-align: center;
-      margin-top: 35px;
-      color: rgba(255,255,255,0.24);
+      margin-top: 30px;
+      color: rgba(255, 255, 255, 0.3);
       font-size: 12px;
-      letter-spacing: 0.02em;
+    }
+    /* Melody Lock styles */
+    #melody-lock {
+      max-width:800px;
+      margin:30px auto 30px auto;
+      background:#101b2e;
+      border-radius:8px;
+      padding:24px 16px 22px 16px;
+      text-align:center;
+    }
+    #melody-piano {
+      margin-bottom: 10px;
+    }
+    #melody-bar {
+      min-height: 20px;
+      margin:0.7em 0;
+      font-family: monospace;
+      color: #00ff8c;
+      letter-spacing: 2px;
+    }
+    .import-group {
+      margin: 0.8em 0;
+    }
+    .import-group input[type="text"] {
+      width: 200px;
+      font-size: 1em;
+      margin-right: 5px;
+      padding: 6px;
+    }
+    .import-group button {
+      padding: 6px 12px;
+      font-size: 1em;
+      margin-left: 2px;
+      margin-top: 0;
     }
     @media (max-width: 600px) {
-      .glasscard,.admin-container { padding: 12px 4vw 10px 4vw;}
-      #melody-piano { gap: 3px;}
-      .melody-key { width: 37px; height: 37px; font-size: .95em;}
-      .melody-pill { font-size: .92em; padding: 2px 7px;}
-      .admin-container { padding: 9px 2vw 8px 2vw;}
-      .preview { padding: 10px;}
+      #melody-bar { font-size: 0.85em; }
+      .import-group input[type="text"] { width: 100px; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <!-- Melody Lock Gate (hash: e4a25ba5b1c66941) -->
-  <div class="glasscard" id="melody-lock">
-    <h2>🔒 Admin Melody Lock</h2>
-    <div class="melody-instructions">
-      <b>Step 1:</b> Play your secret melody or paste its pattern.<br>
-      <b>Step 2:</b> Click <b>Unlock Admin</b>.<br>
-      <div style="font-size:0.95em;margin-top:7px;opacity:0.87;">
-        (To share access: use <code>Export Pattern</code> from your melody tool)
-      </div>
-    </div>
+  <!-- Melody Lock Gate (hash: e4a25ba5b1c669414746d9efdc533019e14bf8a86c288165de44bdcf791d4cfa) -->
+  <div id="melody-lock">
+    <h2 style="color:#00eaff;">Admin Melody Lock</h2>
     <div id="melody-piano"></div>
-    <div class="melody-btns">
+    <div>
       <button id="melody-clear">Clear Melody</button>
       <button id="melody-unlock">Unlock Admin</button>
     </div>
     <div id="melody-bar"></div>
     <div class="import-group">
-      <input type="text" id="importMelodyInput" placeholder="Pattern e.g. 40-43-45">
+      <input type="text" id="importMelodyInput" placeholder="Import pattern (e.g. 40-43-45)">
       <button id="importMelodyBtn">Import</button>
     </div>
-    <div id="melody-status"></div>
+    <div id="melody-status" style="font-weight:bold;color:#ff5050;"></div>
+    <div style="color:#8aafff;font-size:0.9em;margin-top:10px;">
+      Play your secret melody <b>or</b> import the pattern, then click <b>Unlock Admin</b>
+    </div>
   </div>
-  <!-- Admin UI -->
-  <div class="admin-container">
+  <div class="admin-container" style="display:none;">
     <h2>Truth Engine Admin Console</h2>
     <label for="query">Query (exact):</label>
     <input type="text" id="query" placeholder="e.g. what is this?">
@@ -332,26 +220,24 @@
     <div class="admin-footer">© 2025 truth-network admin console</div>
   </div>
   <script>
-    // --- Melody Lock Script ---
-    // Melody hash: e4a25ba5b1c66941
-    const allowedMelodyHash = "e4a25ba5b1c66941";
+    // Melody Lock Script
+    const allowedMelodyHash = "e4a25ba5b1c669414746d9efdc533019e14bf8a86c288165de44bdcf791d4cfa";
     let melody = [];
     function renderPiano() {
       // Octave C4-B4 (60-71)
       const notes = [60,62,64,65,67,69,71];
       const names = ['C','D','E','F','G','A','B'];
-      let html = '';
+      let html = '<div style="display:flex;justify-content:center;">';
       for (let i=0; i<notes.length; ++i) {
-        html += `<div class="melody-key" data-note="${notes[i]}">${names[i]}</div>`;
+        html += `<div data-note="${notes[i]}" style="width:40px;height:120px;margin:1px;background:#fff;border-radius:0 0 6px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-size:0.95em;cursor:pointer;border:1px solid #3377ff;"><span style="margin-bottom:6px;">${names[i]}</span></div>`;
       }
+      html += '</div>';
       document.getElementById('melody-piano').innerHTML = html;
-      document.querySelectorAll('#melody-piano .melody-key').forEach(el=>{
+      document.querySelectorAll('#melody-piano [data-note]').forEach(el=>{
         el.onclick = ()=>{
           playNote(+el.dataset.note);
           melody.push(+el.dataset.note);
           updateMelodyBar();
-          el.classList.add('active');
-          setTimeout(()=>el.classList.remove('active'),120);
         };
       });
     }
@@ -362,22 +248,15 @@
       o.type = 'sine';
       o.frequency.value = freq;
       const g = ctx.createGain();
-      g.gain.setValueAtTime(0.12, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.21);
+      g.gain.setValueAtTime(0.11, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.23);
       o.connect(g).connect(ctx.destination);
       o.start();
-      o.stop(ctx.currentTime + 0.21);
+      o.stop(ctx.currentTime + 0.25);
       o.onended = ()=>ctx.close();
     }
     function updateMelodyBar() {
-      const bar = document.getElementById('melody-bar');
-      bar.innerHTML = '';
-      melody.forEach((m,i) => {
-        const span = document.createElement('span');
-        span.className = 'melody-pill';
-        span.textContent = noteName(m);
-        bar.appendChild(span);
-      });
+      document.getElementById('melody-bar').textContent = melody.map(m=>noteName(m)).join(' ');
     }
     function noteName(midi) {
       const n=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -390,19 +269,16 @@
     };
     document.getElementById('melody-unlock').onclick = async ()=>{
       if (!melody.length) { document.getElementById('melody-status').textContent = 'Play or import your melody!'; return; }
-      // Only use the first 8 bytes of the hash (as in your hash)
       const bytes = new Uint8Array(melody);
       const hashBuf = await window.crypto.subtle.digest('SHA-256', bytes);
       const hashFull = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-      const hash = hashFull.slice(0,16); // Only the first 8 bytes (16 hex chars)
-      if (hash === allowedMelodyHash) {
+      if (hashFull === allowedMelodyHash) {
         document.getElementById('melody-lock').style.display = 'none';
         document.querySelector('.admin-container').style.display = '';
       } else {
         document.getElementById('melody-status').textContent = 'Incorrect melody, try again.';
       }
     };
-    // Import melody pattern
     document.getElementById('importMelodyBtn').onclick = function() {
       const pat = document.getElementById('importMelodyInput').value.trim();
       if (!pat) return;
@@ -413,7 +289,7 @@
     // Hide admin until unlocked
     document.querySelector('.admin-container').style.display = 'none';
     renderPiano();
-    // --- End Melody Lock Script ---
+    // End Melody Lock Script
 
     // --- Truth Engine Admin Logic ---
     const API_BASE = "https://justice.ai-n.workers.dev";
@@ -427,6 +303,7 @@
     const previewDiv = document.getElementById('preview');
     const citationTitles = document.querySelectorAll('.citation-title');
     const citationUrls = document.querySelectorAll('.citation-url');
+
     answerInput.addEventListener('input', () => {
       const content = answerInput.value || '';
       previewDiv.innerHTML = marked.parse(content);
@@ -440,6 +317,7 @@
         contentLengthDiv.classList.remove('warning');
       }
     });
+
     // Load existing answer
     loadBtn.onclick = async () => {
       loadMsg.textContent = '';
@@ -448,6 +326,7 @@
       previewDiv.innerHTML = '';
       citationTitles.forEach(e => e.value = '');
       citationUrls.forEach(e => e.value = '');
+
       const query = queryInput.value.trim();
       if (!query) {
         loadMsg.textContent = "Enter a query.";
@@ -481,6 +360,7 @@
         loadMsg.textContent = "Error loading: " + e;
       }
     };
+
     // Save edited answer
     saveBtn.onclick = async () => {
       saveMsg.textContent = '';
