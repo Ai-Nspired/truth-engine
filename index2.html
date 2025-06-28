@@ -4,9 +4,282 @@
   <meta charset="UTF-8">
   <title>Truth Engine Admin Console</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <style>
-    /* ... (existing CSS unchanged, omitted for brevity) ... */
-    /* Retain your full CSS from before */
+    <style>
+    :  root {
+      --truth-black: #010b14;
+      --truth-dark: #0a1723;
+      --truth-accent: #0055ff;
+      --truth-accent-light: #0cf;
+      --truth-highlight: #5a8bff;
+      --truth-positive: #00ff8c;
+      --truth-warning: #ff5050;
+      --truth-border: rgba(0, 71, 171, 0.5);
+      --glass-blur: blur(16px);
+      --glass-alpha: 0.62;
+      --melody-note: #00eaff;
+      --melody-note-active: #ffe600;
+    }
+    html,body {
+      background: linear-gradient(135deg, #11192e 0%, #212d46 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      color: white;
+      min-height: 100vh;
+    }
+    .glasscard {
+      background: rgba(10,23,35,var(--glass-alpha));
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.20), 0 1.5px 8px 0 #0032aa33;
+      backdrop-filter: var(--glass-blur);
+      padding: 35px 18px 30px 18px;
+      margin: 40px auto 24px auto;
+      max-width: 480px;
+      text-align: center;
+      border: 1px solid var(--truth-border);
+      animation: fadein 0.9s cubic-bezier(.2,1.1,.6,.98);
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(32px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .glasscard h2 {
+      margin-top: 0;
+      color: var(--truth-accent-light);
+      font-weight: 700;
+      font-size: 1.65em;
+      letter-spacing: 0.04em;
+    }
+    .melody-instructions {
+      background: rgba(0,90,255,0.09);
+      color: #afe9ff;
+      font-size: 1.08em;
+      border-radius: 7px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      margin-top: 10px;
+      border-left: 4px solid var(--truth-accent-light);
+      text-align: left;
+      max-width: 420px;
+      margin-left: auto; margin-right: auto;
+    }
+    #melody-piano {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0 7px 0;
+      flex-wrap: wrap;
+    }
+    .melody-key {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(145deg,#eaf6ff 70%,#b4e2fa 100%);
+      box-shadow: 0 2px 8px #0032a922;
+      border: 2.3px solid #3377ff;
+      color: #222;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.13em;
+      cursor: pointer;
+      transition: background 0.16s, box-shadow 0.09s, transform 0.08s;
+      user-select: none;
+      margin: 0 2px;
+    }
+    .melody-key.active, .melody-key:active {
+      background: var(--melody-note-active);
+      box-shadow: 0 0 0 3px #0055ff44;
+      color: #0055ff;
+      transform: scale(1.08);
+    }
+    #melody-bar {
+      margin: 10px 0 10px 0;
+      min-height: 22px;
+    }
+    .melody-pill {
+      display: inline-block;
+      background: var(--melody-note);
+      color: #014;
+      font-weight: 700;
+      font-size: 1em;
+      padding: 3px 10px;
+      border-radius: 18px;
+      margin: 0 2px;
+      margin-bottom: 2px;
+      box-shadow: 0 1px 5px #00eaff33;
+      transition: background 0.15s;
+    }
+    .melody-pill.active {
+      background: var(--melody-note-active);
+      color: #0055ff;
+    }
+    .import-group {
+      margin: 0.8em 0 0.5em 0;
+    }
+    .import-group input[type="text"] {
+      width: 140px;
+      font-size: 1em;
+      margin-right: 5px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      border: 1.5px solid #00eaff88;
+      outline: none;
+      background: #111b2c;
+      color: #fff;
+    }
+    .import-group button {
+      padding: 7px 15px;
+      font-size: 1em;
+      margin-left: 2px;
+      margin-top: 0;
+      border-radius: 6px;
+      background: var(--truth-accent-light);
+      color: #011;
+      border: none;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .import-group button:hover { background: #00aaff; }
+    .melody-btns button {
+      margin-top: 8px;
+      margin-right: 8px;
+      border-radius: 6px;
+      padding: 9px 18px;
+      background: linear-gradient(90deg, #00eaff 0%, #3377ff 100%);
+      color: #011;
+      font-size: 1.09em;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0032aa19;
+      transition: background 0.15s, color 0.09s;
+    }
+    .melody-btns button:last-child { margin-right: 0;}
+    .melody-btns button:hover { background: #00aaff; color: #fff;}
+    #melody-status {
+      font-weight: bold;
+      margin-top: 10px;
+      min-height: 22px;
+      color: var(--truth-warning);
+      letter-spacing: 0.02em;
+    }
+    .admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(10, 23, 35, 0.90);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid var(--truth-border);
+      border-radius: 18px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.23);
+      padding: 28px 28px 18px 28px;
+      margin-bottom: 24px;
+      display: none;
+      animation: fadein 0.9s cubic-bezier(.2,1.1,.6,.98);
+    }
+    .admin-container h2 {
+      margin-top: 0;
+      font-size: 1.45em;
+      color: var(--truth-accent-light);
+      letter-spacing: 0.04em;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #88c6ff;
+      font-size: 1.07em;
+      letter-spacing: 0.01em;
+    }
+    input[type="text"], textarea#answer {
+      width: 100%;
+      padding: 12px 12px;
+      border: 1.5px solid #3377ff44;
+      border-radius: 7px;
+      background: #17223a;
+      color: #e5f7ff;
+      font-size: 1em;
+      box-sizing: border-box;
+      margin-bottom: 3px;
+      outline: none;
+      transition: border 0.15s;
+    }
+    input[type="text"]:focus, textarea#answer:focus {
+      border: 2px solid #00eaff;
+      background: #111b2c;
+    }
+    button {
+      margin-top: 16px;
+      background: linear-gradient(90deg,#0055ff 40%,#0cf 100%);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 28px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0032aa23;
+      transition: background 0.15s, color 0.09s;
+    }
+    button:hover {
+      background: linear-gradient(90deg,#0cf 40%,#0055ff 100%);
+      color: #fff;
+    }
+    .status-message {
+      margin: 15px 0 6px 0;
+      padding: 9px 13px;
+      background: #1c2e4a;
+      border-radius: 5px;
+      color: var(--truth-highlight);
+      font-size: 1.01em;
+    }
+    .preview {
+      width: 100%;
+      min-height: 50px;
+      padding: 18px;
+      margin-top: 12px;
+      background: linear-gradient(95deg,#111b2c 60%,#192a4b 100%);
+      border: 1.5px solid #3377ff33;
+      border-radius: 9px;
+      color: #f6faff;
+      font-size: 1.09em;
+      overflow-y: auto;
+      box-shadow: 0 2px 13px #001b2a0c;
+      transition: background 0.15s;
+    }
+    .content-length {
+      color: var(--truth-highlight);
+      font-size: 0.93em;
+      margin-top: 8px;
+      text-align: right;
+      opacity: 0.75;
+    }
+    .warning {
+      color: var(--truth-warning);
+    }
+    .citations-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+      margin: 12px 0 0 0;
+    }
+    .admin-footer {
+      text-align: center;
+      margin-top: 35px;
+      color: rgba(255,255,255,0.24);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    @media (max-width: 600px) {
+      .glasscard,.admin-container { padding: 12px 4vw 10px 4vw;}
+      #melody-piano { gap: 3px;}
+      .melody-key { width: 37px; height: 37px; font-size: .95em;}
+      .melody-pill { font-size: .92em; padding: 2px 7px;}
+      .admin-container { padding: 9px 2vw 8px 2vw;}
+      .preview { padding: 10px;}
+    }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css"><!-- ADDED -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
