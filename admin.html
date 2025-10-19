@@ -166,7 +166,7 @@
       letter-spacing: 0.02em;
     }
     .admin-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: rgba(10, 23, 35, 0.90);
       backdrop-filter: blur(10px);
@@ -184,6 +184,35 @@
       color: var(--truth-accent-light);
       letter-spacing: 0.04em;
     }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(0, 234, 255, 0.3);
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #88c6ff;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .tab.active {
+      color: #00eaff;
+      border-bottom-color: #00eaff;
+    }
+    .tab:hover {
+      color: #0cf;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
     label {
       display: block;
       margin-top: 20px;
@@ -193,7 +222,7 @@
       font-size: 1.07em;
       letter-spacing: 0.01em;
     }
-    input[type="text"], textarea#answer {
+    input[type="text"], textarea {
       width: 100%;
       padding: 12px 12px;
       border: 1.5px solid #3377ff44;
@@ -205,10 +234,15 @@
       margin-bottom: 3px;
       outline: none;
       transition: border 0.15s;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
     }
-    input[type="text"]:focus, textarea#answer:focus {
+    input[type="text"]:focus, textarea:focus {
       border: 2px solid #00eaff;
       background: #111b2c;
+    }
+    textarea {
+      min-height: 150px;
+      resize: vertical;
     }
     button {
       margin-top: 16px;
@@ -227,6 +261,21 @@
       background: linear-gradient(90deg,#0cf 40%,#0055ff 100%);
       color: #fff;
     }
+    button:disabled {
+      background: #4f545c;
+      cursor: not-allowed;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .button-group button {
+      margin-top: 0;
+      flex: 1;
+      min-width: 120px;
+    }
     .status-message {
       margin: 15px 0 6px 0;
       padding: 9px 13px;
@@ -234,10 +283,11 @@
       border-radius: 5px;
       color: var(--truth-highlight);
       font-size: 1.01em;
+      min-height: 20px;
     }
     .preview {
       width: 100%;
-      min-height: 50px;
+      min-height: 100px;
       padding: 18px;
       margin-top: 12px;
       background: var(--truth-dark);
@@ -272,6 +322,42 @@
       font-size: 12px;
       letter-spacing: 0.02em;
     }
+    .parser-section {
+      background: rgba(0, 90, 255, 0.08);
+      padding: 15px;
+      border-radius: 9px;
+      margin: 15px 0;
+      border-left: 4px solid #00eaff;
+    }
+    .section-title {
+      color: #00eaff;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .info-text {
+      color: #88c6ff;
+      font-size: 0.95em;
+      margin-bottom: 12px;
+    }
+    pre {
+      background: #17223a;
+      padding: 12px;
+      border-radius: 5px;
+      overflow-x: auto;
+      color: #afeeee;
+      border: 1px solid #3377ff44;
+      margin: 10px 0;
+    }
+    .copy-button {
+      padding: 7px 14px;
+      font-size: 0.9em;
+      margin: 0;
+      background: #00eaff;
+      color: #011;
+    }
+    .copy-button:hover {
+      background: #00aaff;
+    }
     @media (max-width: 600px) {
       .glasscard,.admin-container { padding: 12px 4vw 10px 4vw;}
       #melody-piano { gap: 3px;}
@@ -279,11 +365,14 @@
       .melody-pill { font-size: .92em; padding: 2px 7px;}
       .admin-container { padding: 9px 2vw 8px 2vw;}
       .preview { padding: 10px;}
+      .tabs { gap: 5px;}
+      .tab { padding: 8px 12px; font-size: 0.9em;}
+      .button-group { gap: 5px;}
     }
   </style>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css"><!-- ADDED -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script><!-- ADDED -->
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
 </head>
 <body>
   <!-- Melody Lock Gate -->
@@ -308,37 +397,116 @@
     </div>
     <div id="melody-status"></div>
   </div>
+
   <!-- Admin UI -->
-  <div class="admin-container" id="admin-container" style="display:none;">
+  <div class="admin-container" id="admin-container">
     <h2>Truth Engine Admin Console</h2>
-    <label for="query">Query (exact):</label>
-    <input type="text" id="query" placeholder="e.g. what is this?">
-    <button id="loadBtn">Load</button>
-    <div id="loadMsg" class="status-message"></div>
-    <label for="answer">Answer (Markdown supported):</label>
-    <textarea id="answer"></textarea>
-    <label>Citations (up to 2):</label>
-    <div class="citations-container">
-      <input type="text" placeholder="Title" class="citation-title">
-      <input type="text" placeholder="URL" class="citation-url">
-      <input type="text" placeholder="Title" class="citation-title">
-      <input type="text" placeholder="URL" class="citation-url">
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('editor')">Query Editor</button>
+      <button class="tab" onclick="switchTab('parser')">Content Parser</button>
+      <button class="tab" onclick="switchTab('tools')">Tools</button>
     </div>
-    <label for="editor">Your Name (for audit):</label>
-    <input type="text" id="editor" placeholder="admin">
-    <button id="saveBtn">Save</button>
-    <div id="saveMsg" class="status-message"></div>
-    <!-- MODIFIED: Preview and Copy Output button in flex row -->
-    <div style="display:flex;align-items:center;gap:8px;">
-      <label>Preview:</label>
-      <button id="copyPreviewBtn" type="button">Copy Output</button>
+
+    <!-- Editor Tab -->
+    <div id="editor-tab" class="tab-content active">
+      <label for="query">Query (exact):</label>
+      <input type="text" id="query" placeholder="e.g. what is this?">
+      <div class="button-group">
+        <button id="loadBtn">Load</button>
+        <button id="clearEditorBtn">Clear</button>
+      </div>
+      <div id="loadMsg" class="status-message"></div>
+
+      <label for="answer">Answer (Markdown supported):</label>
+      <textarea id="answer" placeholder="Write your truth here..."></textarea>
+
+      <label>Citations (up to 2):</label>
+      <div class="citations-container">
+        <input type="text" placeholder="Title" class="citation-title">
+        <input type="text" placeholder="URL" class="citation-url">
+        <input type="text" placeholder="Title" class="citation-title">
+        <input type="text" placeholder="URL" class="citation-url">
+      </div>
+
+      <label for="editor">Your Name (for audit):</label>
+      <input type="text" id="editor" placeholder="admin">
+
+      <div class="button-group">
+        <button id="saveBtn">Save</button>
+        <button id="copyPreviewBtn">Copy Output</button>
+      </div>
+      <div id="saveMsg" class="status-message"></div>
+
+      <label>Preview (Live Markdown):</label>
+      <div class="preview" id="preview"></div>
+      <div class="content-length" id="contentLength">Character count: 0</div>
     </div>
-    <div class="preview" id="preview"></div>
-    <div class="content-length" id="contentLength">Character count: 0</div>
+
+    <!-- Parser Tab -->
+    <div id="parser-tab" class="tab-content">
+      <div class="parser-section">
+        <div class="section-title">📋 Parse Markdown Content</div>
+        <div class="info-text">Extract structure from Markdown text. Useful for analyzing and reformatting existing content.</div>
+        <label for="parser-input">Paste Markdown/HTML Content:</label>
+        <textarea id="parser-input" placeholder="Paste your content here..."></textarea>
+        <button onclick="parseContent()">Analyze Content</button>
+        <div id="parser-output" class="status-message" style="margin-top: 15px;"></div>
+        <pre id="parsed-structure" style="display: none;"></pre>
+      </div>
+
+      <div class="parser-section">
+        <div class="section-title">🔍 Extract from HTML</div>
+        <div class="info-text">Clean HTML blocks and extract useful text for your answer field.</div>
+        <label for="html-extract">Paste HTML Block:</label>
+        <textarea id="html-extract" placeholder="Paste HTML here..."></textarea>
+        <button onclick="extractFromHTML()">Extract Text</button>
+        <div id="extract-output" class="status-message" style="margin-top: 15px;"></div>
+        <pre id="extracted-text" style="display: none;"></pre>
+        <button class="copy-button" id="copyExtractBtn" onclick="copyExtractedText()" style="display: none;">Copy Extracted</button>
+      </div>
+
+      <div class="parser-section">
+        <div class="section-title">📐 Analyze Structure</div>
+        <div class="info-text">Get statistics and structure insights from your answer text.</div>
+        <button onclick="analyzeAnswerStructure()">Analyze Current Answer</button>
+        <pre id="structure-analysis" style="display: none;"></pre>
+      </div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="tools-tab" class="tab-content">
+      <div class="parser-section">
+        <div class="section-title">🔄 Markdown Formatter</div>
+        <div class="info-text">Quick formatting helpers for common Markdown patterns.</div>
+        <button onclick="insertMarkdown('**bold**', '**', '**')">Bold</button>
+        <button onclick="insertMarkdown('*italic*', '*', '*')">Italic</button>
+        <button onclick="insertMarkdown('```code\n\n```', '```\n', '\n```')">Code Block</button>
+        <button onclick="insertMarkdown('[link](url)', '[', ']')">Link</button>
+        <button onclick="insertMarkdown('# Heading', '# ', '')">Heading</button>
+        <button onclick="insertMarkdown('- item', '- ', '')">List Item</button>
+      </div>
+
+      <div class="parser-section">
+        <div class="section-title">✂️ Text Tools</div>
+        <button onclick="transformCase('upper')">UPPERCASE</button>
+        <button onclick="transformCase('lower')">lowercase</button>
+        <button onclick="transformCase('title')">Title Case</button>
+        <button onclick="removeExtraWhitespace()">Remove Extra Spaces</button>
+      </div>
+
+      <div class="parser-section">
+        <div class="section-title">📊 Export/Import</div>
+        <button onclick="exportAsJSON()">Export as JSON</button>
+        <button onclick="document.getElementById('importJsonFile').click()">Import from JSON</button>
+        <input type="file" id="importJsonFile" accept=".json" style="display: none;" onchange="importFromJSON(event)">
+      </div>
+    </div>
+
     <div class="admin-footer">© 2025 truth-network admin console</div>
   </div>
+
   <script>
-    // --- Highlight.js & marked.js setup (ADDED) ---
     marked.setOptions({
       highlight: function(code, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -347,13 +515,12 @@
         return hljs.highlightAuto(code).value;
       }
     });
-    // --- End Highlight.js & marked.js setup ---
 
     // Melody Lock Script
     const allowedMelodyHash = "e4a25ba5b1c669414746d9efdc533019e14bf8a86c288165de44bdcf791d4cfa";
     let melody = [];
+    
     function renderPiano() {
-      // Octave C4-B4 (60-71)
       const notes = [60,62,64,65,67,69,71];
       const names = ['C','D','E','F','G','A','B'];
       let html = '';
@@ -371,6 +538,7 @@
         };
       });
     }
+    
     function playNote(midi) {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const freq = 440 * Math.pow(2, (midi-69)/12);
@@ -385,6 +553,7 @@
       o.stop(ctx.currentTime + 0.21);
       o.onended = ()=>ctx.close();
     }
+    
     function updateMelodyBar() {
       const bar = document.getElementById('melody-bar');
       bar.innerHTML = '';
@@ -395,15 +564,18 @@
         bar.appendChild(span);
       });
     }
+    
     function noteName(midi) {
       const n=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
       return n[midi%12]+Math.floor(midi/12-1);
     }
+    
     document.getElementById('melody-clear').onclick = ()=>{
       melody=[];
       updateMelodyBar();
       document.getElementById('melody-status').textContent = '';
     };
+    
     document.getElementById('melody-unlock').onclick = async ()=>{
       if (!melody.length) { document.getElementById('melody-status').textContent = 'Play or import your melody!'; return; }
       const bytes = new Uint8Array(melody);
@@ -416,6 +588,7 @@
         document.getElementById('melody-status').textContent = 'Incorrect melody, try again.';
       }
     };
+    
     document.getElementById('importMelodyBtn').onclick = function() {
       const pat = document.getElementById('importMelodyInput').value.trim();
       if (!pat) return;
@@ -423,12 +596,18 @@
       updateMelodyBar();
       document.getElementById('melody-status').textContent = '';
     };
-    // Hide admin until unlocked
-    document.getElementById('admin-container').style.display = 'none';
-    renderPiano();
-    // --- End Melody Lock Script ---
 
-    // --- Truth Engine Admin Logic ---
+    renderPiano();
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+
+    // Editor functionality
     const API_BASE = "https://justice.ai-n.workers.dev";
     const queryInput = document.getElementById('query');
     const answerInput = document.getElementById('answer');
@@ -444,25 +623,22 @@
     answerInput.addEventListener('input', () => {
       const content = answerInput.value || '';
       previewDiv.innerHTML = marked.parse(content);
-      // Highlight code blocks after rendering
       document.querySelectorAll('#preview pre code').forEach(block => {
         hljs.highlightElement(block);
-      }); // ADDED
+      });
       const charCount = content.length;
       const contentLengthDiv = document.getElementById('contentLength');
       contentLengthDiv.textContent = `Character count: ${charCount}`;
       if (charCount > 8000) {
         contentLengthDiv.classList.add('warning');
-        contentLengthDiv.textContent += " (Very long content may be truncated in some systems)";
+        contentLengthDiv.textContent += " (Very long content may be truncated)";
       } else {
         contentLengthDiv.classList.remove('warning');
       }
     });
 
-    // Copy Preview Button Logic (ADDED)
     document.getElementById('copyPreviewBtn').onclick = function() {
       const preview = document.getElementById('preview');
-      // Use Selection API for plain text copy
       const range = document.createRange();
       range.selectNodeContents(preview);
       const selection = window.getSelection();
@@ -477,7 +653,18 @@
       }
     };
 
-    // Load existing answer
+    document.getElementById('clearEditorBtn').onclick = function() {
+      if (confirm('Clear all editor content?')) {
+        answerInput.value = '';
+        queryInput.value = '';
+        previewDiv.innerHTML = '';
+        citationTitles.forEach(e => e.value = '');
+        citationUrls.forEach(e => e.value = '');
+        loadMsg.textContent = '';
+        saveMsg.textContent = '';
+      }
+    };
+
     loadBtn.onclick = async () => {
       loadMsg.textContent = '';
       saveMsg.textContent = '';
@@ -501,13 +688,11 @@
         if (data.answer) {
           answerInput.value = data.answer;
           previewDiv.innerHTML = marked.parse(data.answer);
-          // Highlight code blocks after rendering (ADDED)
           document.querySelectorAll('#preview pre code').forEach(block => {
             hljs.highlightElement(block);
           });
           const charCount = data.answer.length;
-          const contentLengthDiv = document.getElementById('contentLength');
-          contentLengthDiv.textContent = `Character count: ${charCount}`;
+          document.getElementById('contentLength').textContent = `Character count: ${charCount}`;
           if (data.citations && Array.isArray(data.citations)) {
             data.citations.slice(0,2).forEach((c, i) => {
               citationTitles[i].value = c.title || '';
@@ -522,7 +707,7 @@
         loadMsg.textContent = "Error loading: " + e;
       }
     };
-    // Save edited answer
+
     saveBtn.onclick = async () => {
       saveMsg.textContent = '';
       const query = queryInput.value.trim();
@@ -560,6 +745,213 @@
         saveMsg.textContent = "Error saving: " + e;
       }
     };
+
+    // Parser Functions
+    function parseContent() {
+      const input = document.getElementById('parser-input').value;
+      const output = document.getElementById('parser-output');
+      const structure = document.getElementById('parsed-structure');
+      
+      if (!input.trim()) {
+        output.textContent = 'Please paste content to analyze.';
+        structure.style.display = 'none';
+        return;
+      }
+
+      const lines = input.split('\n');
+      const analysis = {
+        totalLines: lines.length,
+        totalChars: input.length,
+        headings: lines.filter(l => l.match(/^#+\s/)).length,
+        codeBlocks: (input.match(/```/g) || []).length / 2,
+        links: (input.match(/\[.*?\]\(.*?\)/g) || []).length,
+        lists: lines.filter(l => l.match(/^[-*+]\s/)).length,
+        paragraphs: lines.filter(l => l.trim().length > 0 && !l.match(/^[#\-*+`]/)).length
+      };
+
+      structure.textContent = JSON.stringify(analysis, null, 2);
+      structure.style.display = 'block';
+      output.textContent = `✓ Analysis complete: ${analysis.paragraphs} paragraphs, ${analysis.headings} headings, ${analysis.links} links`;
+    }
+
+    function extractFromHTML() {
+      const input = document.getElementById('html-extract').value;
+      const output = document.getElementById('extract-output');
+      const extracted = document.getElementById('extracted-text');
+      const copyBtn = document.getElementById('copyExtractBtn');
+
+      if (!input.trim()) {
+        output.textContent = 'Please paste HTML to extract.';
+        extracted.style.display = 'none';
+        copyBtn.style.display = 'none';
+        return;
+      }
+
+      try {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = input;
+
+        // Remove script and style tags
+        tempDiv.querySelectorAll('script, style').forEach(el => el.remove());
+
+        // Extract text content
+        let text = tempDiv.innerText || tempDiv.textContent;
+        
+        // Clean up whitespace
+        text = text.split('\n').map(l => l.trim()).filter(l => l).join('\n');
+
+        extracted.textContent = text;
+        extracted.style.display = 'block';
+        copyBtn.style.display = 'block';
+        output.textContent = `✓ Extracted ${text.length} characters`;
+      } catch (e) {
+        output.textContent = `Error parsing HTML: ${e.message}`;
+        extracted.style.display = 'none';
+        copyBtn.style.display = 'none';
+      }
+    }
+
+    function copyExtractedText() {
+      const text = document.getElementById('extracted-text').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Extracted text copied to clipboard!');
+      });
+    }
+
+    function analyzeAnswerStructure() {
+      const answer = answerInput.value;
+      const output = document.getElementById('structure-analysis');
+
+      if (!answer.trim()) {
+        output.textContent = 'No answer content to analyze.';
+        output.style.display = 'block';
+        return;
+      }
+
+      const lines = answer.split('\n');
+      const analysis = {
+        totalCharacters: answer.length,
+        totalLines: lines.length,
+        averageLineLength: Math.round(answer.length / lines.length),
+        headings: lines.filter(l => l.match(/^#+\s/)).map(l => l.trim()),
+        codeBlocks: (answer.match(/```/g) || []).length / 2,
+        links: (answer.match(/\[.*?\]\(.*?\)/g) || []),
+        lists: lines.filter(l => l.match(/^[-*+]\s/)).length,
+        readabilityScore: calculateReadability(answer)
+      };
+
+      output.textContent = JSON.stringify(analysis, null, 2);
+      output.style.display = 'block';
+    }
+
+    function calculateReadability(text) {
+      const sentences = text.split(/[.!?]+/).length;
+      const words = text.split(/\s+/).length;
+      const avgWordsPerSentence = words / sentences;
+      
+      if (avgWordsPerSentence < 15) return 'Excellent';
+      if (avgWordsPerSentence < 20) return 'Good';
+      if (avgWordsPerSentence < 25) return 'Fair';
+      return 'Dense';
+    }
+
+    // Markdown formatting helpers
+    function insertMarkdown(text, before, after) {
+      const start = answerInput.selectionStart;
+      const end = answerInput.selectionEnd;
+      const selected = answerInput.value.substring(start, end);
+      const replacement = before + (selected || text) + after;
+      
+      answerInput.value = answerInput.value.substring(0, start) + replacement + answerInput.value.substring(end);
+      answerInput.focus();
+      answerInput.selectionStart = start + before.length;
+      answerInput.selectionEnd = start + before.length + (selected || text).length;
+      
+      // Trigger preview update
+      answerInput.dispatchEvent(new Event('input'));
+    }
+
+    function transformCase(type) {
+      const start = answerInput.selectionStart;
+      const end = answerInput.selectionEnd;
+      const selected = answerInput.value.substring(start, end);
+
+      if (!selected) {
+        alert('Select text first');
+        return;
+      }
+
+      let transformed = selected;
+      if (type === 'upper') transformed = selected.toUpperCase();
+      else if (type === 'lower') transformed = selected.toLowerCase();
+      else if (type === 'title') {
+        transformed = selected.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+
+      answerInput.value = answerInput.value.substring(0, start) + transformed + answerInput.value.substring(end);
+      answerInput.focus();
+      answerInput.dispatchEvent(new Event('input'));
+    }
+
+    function removeExtraWhitespace() {
+      const content = answerInput.value;
+      const cleaned = content.split('\n').map(l => l.trim()).join('\n').replace(/\n\n\n+/g, '\n\n');
+      answerInput.value = cleaned;
+      answerInput.dispatchEvent(new Event('input'));
+    }
+
+    function exportAsJSON() {
+      const data = {
+        query: queryInput.value,
+        answer: answerInput.value,
+        editor: editorInput.value,
+        citations: [],
+        exportDate: new Date().toISOString()
+      };
+
+      for (let i = 0; i < 2; ++i) {
+        const title = citationTitles[i].value.trim();
+        const url = citationUrls[i].value.trim();
+        if (title && url) data.citations.push({ title, url });
+      }
+
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `truth-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importFromJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          queryInput.value = data.query || '';
+          answerInput.value = data.answer || '';
+          editorInput.value = data.editor || 'admin';
+          
+          if (data.citations && Array.isArray(data.citations)) {
+            data.citations.slice(0, 2).forEach((c, i) => {
+              citationTitles[i].value = c.title || '';
+              citationUrls[i].value = c.url || '';
+            });
+          }
+
+          answerInput.dispatchEvent(new Event('input'));
+          alert('✓ JSON imported successfully');
+        } catch (err) {
+          alert('Error parsing JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
   </script>
 </body>
 </html>
