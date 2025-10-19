@@ -375,7 +375,6 @@
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
 </head>
 <body>
-  <!-- Melody Lock Gate -->
   <div class="glasscard" id="melody-lock">
     <h2>🔒 Admin Melody Lock</h2>
     <div class="melody-instructions">
@@ -398,17 +397,14 @@
     <div id="melody-status"></div>
   </div>
 
-  <!-- Admin UI -->
   <div class="admin-container" id="admin-container">
     <h2>Truth Engine Admin Console</h2>
     
     <div class="tabs">
       <button class="tab active" onclick="switchTab('editor')">Query Editor</button>
       <button class="tab" onclick="switchTab('parser')">Content Parser</button>
-      <button class="tab" onclick="switchTab('tools')">Tools</button>
     </div>
 
-    <!-- Editor Tab -->
     <div id="editor-tab" class="tab-content active">
       <label for="query">Query (exact):</label>
       <input type="text" id="query" placeholder="e.g. what is this?">
@@ -419,6 +415,16 @@
       <div id="loadMsg" class="status-message"></div>
 
       <label for="answer">Answer (Markdown supported):</label>
+      <div class="button-group" style="margin-top: 5px; margin-bottom: 12px; gap: 6px;">
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('**text**', '**', '**')">Bold</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('*text*', '*', '*')">Italic</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('`code`', '`', '`')">Code</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('```\ncode block\n```', '```\n', '\n```')">Block</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('[link](url)', '[', '](url)')">Link</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('# ', '# ', '')">H1</button>
+        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('- ', '- ', '')">List</button>
+      </div>
+
       <textarea id="answer" placeholder="Write your truth here..."></textarea>
 
       <label>Citations (up to 2):</label>
@@ -443,12 +449,11 @@
       <div class="content-length" id="contentLength">Character count: 0</div>
     </div>
 
-    <!-- Parser Tab -->
     <div id="parser-tab" class="tab-content">
       <div class="parser-section">
         <div class="section-title">📋 Parse Markdown Content</div>
         <div class="info-text">Extract structure from Markdown text. Useful for analyzing and reformatting existing content.</div>
-        <label for="parser-input">Paste Markdown/HTML Content:</label>
+        <label for="parser-input">Paste Markdown/HTML Content (or content from the Answer field):</label>
         <textarea id="parser-input" placeholder="Paste your content here..."></textarea>
         <button onclick="parseContent()">Analyze Content</button>
         <div id="parser-output" class="status-message" style="margin-top: 15px;"></div>
@@ -474,35 +479,6 @@
       </div>
     </div>
 
-    <!-- Tools Tab -->
-    <div id="tools-tab" class="tab-content">
-      <div class="parser-section">
-        <div class="section-title">🔄 Markdown Formatter</div>
-        <div class="info-text">Quick formatting helpers for common Markdown patterns.</div>
-        <button onclick="insertMarkdown('**bold**', '**', '**')">Bold</button>
-        <button onclick="insertMarkdown('*italic*', '*', '*')">Italic</button>
-        <button onclick="insertMarkdown('```code\n\n```', '```\n', '\n```')">Code Block</button>
-        <button onclick="insertMarkdown('[link](url)', '[', ']')">Link</button>
-        <button onclick="insertMarkdown('# Heading', '# ', '')">Heading</button>
-        <button onclick="insertMarkdown('- item', '- ', '')">List Item</button>
-      </div>
-
-      <div class="parser-section">
-        <div class="section-title">✂️ Text Tools</div>
-        <button onclick="transformCase('upper')">UPPERCASE</button>
-        <button onclick="transformCase('lower')">lowercase</button>
-        <button onclick="transformCase('title')">Title Case</button>
-        <button onclick="removeExtraWhitespace()">Remove Extra Spaces</button>
-      </div>
-
-      <div class="parser-section">
-        <div class="section-title">📊 Export/Import</div>
-        <button onclick="exportAsJSON()">Export as JSON</button>
-        <button onclick="document.getElementById('importJsonFile').click()">Import from JSON</button>
-        <input type="file" id="importJsonFile" accept=".json" style="display: none;" onchange="importFromJSON(event)">
-      </div>
-    </div>
-
     <div class="admin-footer">© 2025 truth-network admin console</div>
   </div>
 
@@ -516,7 +492,7 @@
       }
     });
 
-    // Melody Lock Script
+    // Melody Lock Script (Kept as is)
     const allowedMelodyHash = "e4a25ba5b1c669414746d9efdc533019e14bf8a86c288165de44bdcf791d4cfa";
     let melody = [];
     
@@ -527,7 +503,7 @@
       for (let i=0; i<notes.length; ++i) {
         html += `<div class="melody-key" data-note="${notes[i]}">${names[i]}</div>`;
       }
-      document.getElementById('melody-piano').innerHTML = html;
+      document.querySelectorAll('#melody-piano').forEach(piano => piano.innerHTML = html);
       document.querySelectorAll('#melody-piano .melody-key').forEach(el=>{
         el.onclick = ()=>{
           playNote(+el.dataset.note);
@@ -599,12 +575,18 @@
 
     renderPiano();
 
-    // Tab switching
+    // Tab switching (Modified to work outside of click event)
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById(tabName + '-tab').classList.add('active');
+      
+      const targetButton = document.querySelector(`.tabs button[onclick*="switchTab('${tabName}')"]`);
+      const targetContent = document.getElementById(tabName + '-tab');
+
+      if (targetButton && targetContent) {
+        targetButton.classList.add('active');
+        targetContent.classList.add('active');
+      }
     }
 
     // Editor functionality
@@ -662,9 +644,11 @@
         citationUrls.forEach(e => e.value = '');
         loadMsg.textContent = '';
         saveMsg.textContent = '';
+        answerInput.dispatchEvent(new Event('input')); // Update preview/count
       }
     };
 
+    // MODIFIED Load function to auto-switch tab
     loadBtn.onclick = async () => {
       loadMsg.textContent = '';
       saveMsg.textContent = '';
@@ -687,12 +671,8 @@
         const data = await resp.json();
         if (data.answer) {
           answerInput.value = data.answer;
-          previewDiv.innerHTML = marked.parse(data.answer);
-          document.querySelectorAll('#preview pre code').forEach(block => {
-            hljs.highlightElement(block);
-          });
-          const charCount = data.answer.length;
-          document.getElementById('contentLength').textContent = `Character count: ${charCount}`;
+          answerInput.dispatchEvent(new Event('input')); // Manually trigger input to update preview
+          
           if (data.citations && Array.isArray(data.citations)) {
             data.citations.slice(0,2).forEach((c, i) => {
               citationTitles[i].value = c.title || '';
@@ -700,6 +680,10 @@
             });
           }
           loadMsg.textContent = data.edited ? `Loaded (edited by ${data.lastEditedBy || "unknown"})` : "Loaded (AI generated)";
+
+          // **AUTOMATICALLY SWITCH to the Content Parser tab**
+          switchTab('parser'); 
+          
         } else {
           loadMsg.textContent = "No answer found. You can create one.";
         }
@@ -871,6 +855,7 @@
       answerInput.dispatchEvent(new Event('input'));
     }
 
+    // Text tools (kept but no longer assigned to buttons in the removed tab)
     function transformCase(type) {
       const start = answerInput.selectionStart;
       const end = answerInput.selectionEnd;
@@ -900,6 +885,7 @@
       answerInput.dispatchEvent(new Event('input'));
     }
 
+    // Export/Import functions (kept but no longer assigned to buttons in the removed tab)
     function exportAsJSON() {
       const data = {
         query: queryInput.value,
