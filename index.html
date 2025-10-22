@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CybrJustice | Ingenium Veritas</title>
+  <title>AI-n.org Speakeasy Collective | Establishing the Truth Network</title> 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
   <style>
-    /* ... (all your CSS, unchanged) ... */
     /* --- High Contrast Minimalist Theme (Centered) --- */
     :root {
       --header-bg: #FFFFFF; /* White Header */
@@ -71,13 +69,14 @@
       justify-content: center;
       background-color: var(--main-bg);
       padding: 60px 0;
-      transition: opacity 0.5s ease-out; /* For fade out */
+      transition: opacity 0.5s ease-out;
     }
     main.hidden {
         opacity: 0;
-        pointer-events: none; /* Prevent interaction when hidden */
+        pointer-events: none;
     }
     .coming-soon-section { text-align: center; padding: 20px; }
+    /* UPDATED: Main Branding */
     .coming-soon-section h1 { font-size: 2.8em; color: var(--main-header); margin: 0 0 10px 0; font-weight: 500; letter-spacing: 1px; }
     .coming-soon-section .tagline { font-size: 1.1em; color: var(--main-text); margin-bottom: 30px; font-weight: 300; }
     .coming-soon-section h2 { font-size: 1.8em; margin-bottom: 20px; color: var(--main-header); font-weight: 400; }
@@ -93,11 +92,11 @@
       border-top: 1px solid var(--border-color);
       position: relative;
       text-align: center;
-      transition: opacity 0.5s ease-out; /* For fade out */
+      transition: opacity 0.5s ease-out;
     }
      .site-footer.hidden {
         opacity: 0;
-        pointer-events: none; /* Prevent interaction when hidden */
+        pointer-events: none;
     }
     .footer-bottom { text-align: center; font-size: 0.9em; color: var(--footer-text); }
     .footer-bottom p { margin: 0; padding: 0; }
@@ -108,8 +107,8 @@
         position: absolute;
         bottom: 5px;
         right: 10px;
-        opacity: 0.2; /* Make it slightly visible */
-        cursor: pointer; /* Always indicate clickable */
+        opacity: 0.2;
+        cursor: pointer;
         transition: opacity 0.5s ease-in-out;
         z-index: 10;
         font-size: 0.7rem;
@@ -131,18 +130,17 @@
     }
     /* --- Container for Truth Engine UI --- */
     #truth-engine-container {
-        position: fixed; /* Or absolute, depending on desired behavior */
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 100; /* Ensure it's above other content */
-        display: none; /* Initially hidden */
-        /* Background could be set here or by the UI module */
-        background-color: var(--main-bg); /* Match main background */
+        z-index: 100;
+        display: none;
+        background-color: var(--main-bg);
     }
     #truth-engine-container.visible {
-        display: block; /* Show when activated */
+        display: block;
     }
     #terminal-container {
         position: fixed;
@@ -156,7 +154,6 @@
  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <!-- Header -->
   <header class="site-header-new">
     <nav class="header-nav">
         <ul>
@@ -168,11 +165,10 @@
         </ul>
     </nav>
   </header>
-  <!-- Main Content -->
   <main id="main-content">
     <section class="coming-soon-section">
       <div class="container">
-        <h1>CybrJustice</h1>
+        <h1>AI-n.org Speakeasy Collective</h1>
         <p class="tagline">Ingenium Veritas</p>
         <h2>Establishing the Truth Network...</h2>
         <p>
@@ -184,15 +180,13 @@
       </div>
     </section>
   </main>
-  <!-- Truth Engine Container -->
   <div id="truth-engine-container">
     <div id="truth-engine-response" style="white-space: pre-wrap; font-family: monospace; font-size: 1.1em; color: #00FF41; padding: 20px;"></div>
   </div>
-  <!-- Footer -->
   <footer class="site-footer" id="site-footer">
     <div class="container">
       <div class="footer-bottom">
-        <p>© 2025 CybrJustice<span class="latin-tag">- tessera veritatis</span></p>
+        <p>© 2025 AI-n.org Speakeasy Collective<span class="latin-tag">- tessera veritatis</span></p>
         <div class="rabbit-container" title="Follow...">
           <span id="white-rabbit">🐇</span>
         </div>
@@ -202,15 +196,11 @@
       </div>
     </div>
   </footer>
-  <!-- Load Framework Scripts -->
-  <script type="module" src="core/loader.js"></script>
-  <script type="module" src="index.js"></script>
-  <script type="module" src="./modules/truth-engine/ui.js"></script>
   <a href="admin.html" style="position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none;">Admin</a>
-  <!-- White Rabbit Admin Link -->
   <script>
     document.getElementById('white-rabbit').addEventListener('click', function(e) {
       e.preventDefault();
+      // Assuming your editor is now correctly named admin.html
       window.open('admin.html', '_blank');
     });
   </script>
