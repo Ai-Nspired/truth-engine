@@ -2,10 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Truth Engine Admin Console</title>
+  <title>Truth Engine Admin Console - Creator Edition</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <style>
-    :  root {
+    /* --- MODE VARIABLES (Adapted from stable.html) --- */
+    :root {
+      /* Base Admin Theme (Default: Silvery/Light for the Admin UI) */
+      --admin-bg: linear-gradient(135deg, #11192e 0%, #212d46 100%);
+      --admin-text: white;
+      --admin-input-bg: #17223a;
+      --admin-input-color: #e5f7ff;
+      
+      /* Truth Engine Output Theme Variables (for Preview) */
+      --output-bg-color: #f8f8ff; /* Silvery Default */
+      --output-text-color: #1a1a1a;
+      --output-secondary-text: #6c757d;
+      --output-accent-color: #1a2a3a;
+
+      /* Existing Melody/Admin Controls */
       --truth-black: #010b14;
       --truth-dark: #0a1723;
       --truth-accent: #0055ff;
@@ -18,16 +32,40 @@
       --glass-alpha: 0.62;
       --melody-note: #00eaff;
       --melody-note-active: #ffe600;
+      
+      /* NEW BLOCK STYLES (Adapted) */
+      --block-source-bg: rgba(26, 42, 58, 0.5);
+      --block-memo-bg: rgba(0, 71, 171, 0.2);
+      --block-blueprint-bg: rgba(0, 255, 136, 0.1);
+      --block-logic-bg: #111b2c;
+      --block-spy-ink-bg: #000000;
+      --block-text-normal: #e5f7ff;
     }
+    
+    /* OUTPUT THEME MODES */
+    [data-output-mode="dark"] {
+        --output-bg-color: #1a1a1a;
+        --output-text-color: #f0f0f0;
+        --output-secondary-text: #9fa8da;
+        --output-accent-color: #c7a17a;
+    }
+    [data-output-mode="neo"] {
+        --output-bg-color: #000000;
+        --output-text-color: #00FF00;
+        --output-secondary-text: #00AA00;
+        --output-accent-color: #00FF00;
+    }
+
+    /* --- BASE STYLES --- */
     html,body {
-      background: linear-gradient(135deg, #11192e 0%, #212d46 100%);
+      background: var(--admin-bg);
       min-height: 100vh;
       margin: 0;
       padding: 0;
     }
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-      color: white;
+      color: var(--admin-text);
       min-height: 100vh;
     }
     .glasscard {
@@ -111,10 +149,6 @@
       box-shadow: 0 1px 5px #00eaff33;
       transition: background 0.15s;
     }
-    .melody-pill.active {
-      background: var(--melody-note-active);
-      color: #0055ff;
-    }
     .import-group {
       margin: 0.8em 0 0.5em 0;
     }
@@ -126,8 +160,8 @@
       border-radius: 6px;
       border: 1.5px solid #00eaff88;
       outline: none;
-      background: #111b2c;
-      color: #fff;
+      background: var(--admin-input-bg);
+      color: var(--admin-input-color);
     }
     .import-group button {
       padding: 7px 15px;
@@ -185,7 +219,7 @@
       letter-spacing: 0.04em;
     }
     .tabs {
-      display: flex;
+      display: none;
       gap: 10px;
       margin-bottom: 20px;
       border-bottom: 2px solid rgba(0, 234, 255, 0.3);
@@ -204,15 +238,6 @@
       color: #00eaff;
       border-bottom-color: #00eaff;
     }
-    .tab:hover {
-      color: #0cf;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
     label {
       display: block;
       margin-top: 20px;
@@ -222,13 +247,13 @@
       font-size: 1.07em;
       letter-spacing: 0.01em;
     }
-    input[type="text"], textarea {
+    input[type="text"], textarea, select {
       width: 100%;
       padding: 12px 12px;
       border: 1.5px solid #3377ff44;
       border-radius: 7px;
-      background: #17223a;
-      color: #e5f7ff;
+      background: var(--admin-input-bg);
+      color: var(--admin-input-color);
       font-size: 1em;
       box-sizing: border-box;
       margin-bottom: 3px;
@@ -236,13 +261,14 @@
       transition: border 0.15s;
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
     }
-    input[type="text"]:focus, textarea:focus {
+    input[type="text"]:focus, textarea:focus, select:focus {
       border: 2px solid #00eaff;
       background: #111b2c;
     }
     textarea {
       min-height: 150px;
       resize: vertical;
+      transition: min-height 0.3s;
     }
     button {
       margin-top: 16px;
@@ -285,19 +311,28 @@
       font-size: 1.01em;
       min-height: 20px;
     }
+    
+    /* PREVIEW STYLES (Dynamic Theming) */
+    .preview-wrapper {
+        display: block; /* Default to visible */
+        transition: all 0.3s;
+    }
     .preview {
       width: 100%;
       min-height: 100px;
       padding: 18px;
       margin-top: 12px;
-      background: var(--truth-dark);
-      border: 1.5px solid #3377ff33;
+      background: var(--output-bg-color);
+      border: 1.5px solid var(--output-accent-color);
       border-radius: 9px;
-      color: var(--truth-highlight);
+      color: var(--output-text-color);
       font-size: 1.09em;
       overflow-y: auto;
       box-shadow: 0 2px 13px #001b2a0c;
-      transition: background 0.15s;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+    }
+    .preview.hidden {
+        display: none;
     }
     .content-length {
       color: var(--truth-highlight);
@@ -306,6 +341,32 @@
       text-align: right;
       opacity: 0.75;
     }
+    
+    /* PREVIEW TOGGLE BUTTON */
+    #togglePreviewBtn {
+        background: #4f545c;
+        color: white;
+        margin-top: 0;
+        min-width: unset;
+        flex: 1;
+    }
+    #togglePreviewBtn:hover {
+        background: #677bc4;
+    }
+
+    /* Output Mode Select */
+    .mode-select-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .mode-select-row label {
+        margin-top: 0;
+        font-weight: 500;
+        font-size: 1em;
+    }
+
     .warning {
       color: var(--truth-warning);
     }
@@ -322,42 +383,78 @@
       font-size: 12px;
       letter-spacing: 0.02em;
     }
-    .parser-section {
-      background: rgba(0, 90, 255, 0.08);
-      padding: 15px;
-      border-radius: 9px;
-      margin: 15px 0;
-      border-left: 4px solid #00eaff;
+    .creation-helpers-section {
+        background: rgba(0, 90, 255, 0.08);
+        padding: 15px;
+        border-radius: 9px;
+        margin-top: 15px;
+        border-left: 4px solid #00eaff;
     }
-    .section-title {
-      color: #00eaff;
-      font-weight: 600;
-      margin-bottom: 10px;
+    .creation-helpers-section h4 {
+        color: #00eaff;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: 600;
     }
-    .info-text {
-      color: #88c6ff;
-      font-size: 0.95em;
-      margin-bottom: 12px;
+    .creation-button-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
     }
-    pre {
-      background: #17223a;
-      padding: 12px;
-      border-radius: 5px;
-      overflow-x: auto;
-      color: #afeeee;
-      border: 1px solid #3377ff44;
-      margin: 10px 0;
+    .creation-button-row button {
+        flex: unset; 
+        min-width: 0; 
+        padding: 7px 12px; 
+        font-size: 0.9em; 
+        background: #1c2e4a; 
+        color: #00eaff;
+        border: 1px solid #00eaff44;
+        transition: background-color 0.1s;
     }
-    .copy-button {
-      padding: 7px 14px;
-      font-size: 0.9em;
-      margin: 0;
-      background: #00eaff;
-      color: #011;
+    .creation-button-row button:hover {
+        background: #00eaff;
+        color: #1c2e4a;
     }
-    .copy-button:hover {
-      background: #00aaff;
+    .module-stack-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
     }
+    .module-stack-row select {
+        flex-grow: 1;
+        margin-bottom: 0;
+        min-height: 40px;
+    }
+    .module-stack-row button {
+        margin-top: 0;
+        flex: unset;
+        padding: 10px 18px;
+        background: var(--truth-positive);
+        color: var(--truth-black);
+    }
+    .module-stack-row button:hover {
+        background: #00c46e;
+    }
+    .audit-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid #3377ff44;
+    }
+    .audit-fields input {
+        margin-top: 0;
+    }
+    .audit-fields label {
+        margin-top: 0;
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+
+    /* MEDIA QUERIES */
     @media (max-width: 600px) {
       .glasscard,.admin-container { padding: 12px 4vw 10px 4vw;}
       #melody-piano { gap: 3px;}
@@ -365,17 +462,18 @@
       .melody-pill { font-size: .92em; padding: 2px 7px;}
       .admin-container { padding: 9px 2vw 8px 2vw;}
       .preview { padding: 10px;}
-      .tabs { gap: 5px;}
-      .tab { padding: 8px 12px; font-size: 0.9em;}
       .button-group { gap: 5px;}
+      .creation-button-row button { padding: 5px 8px; font-size: 0.8em;}
+      .module-stack-row { flex-direction: column; }
+      .module-stack-row select { width: 100%; }
+      .audit-fields { grid-template-columns: 1fr; }
     }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
 </head>
-<body>
-  <div class="glasscard" id="melody-lock">
+<body data-output-mode="silvery"> <div class="glasscard" id="melody-lock">
     <h2>🔒 Admin Melody Lock</h2>
     <div class="melody-instructions">
       <b>Step 1:</b> Play your secret melody or paste its pattern.<br>
@@ -400,11 +498,6 @@
   <div class="admin-container" id="admin-container">
     <h2>Truth Engine Admin Console</h2>
     
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('editor')">Query Editor</button>
-      <button class="tab" onclick="switchTab('parser')">Content Parser</button>
-    </div>
-
     <div id="editor-tab" class="tab-content active">
       <label for="query">Query (exact):</label>
       <input type="text" id="query" placeholder="e.g. what is this?">
@@ -414,75 +507,79 @@
       </div>
       <div id="loadMsg" class="status-message"></div>
 
-      <label for="answer">Answer (Markdown supported):</label>
-      <div class="button-group" style="margin-top: 5px; margin-bottom: 12px; gap: 6px;">
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('**text**', '**', '**')">Bold</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('*text*', '*', '*')">Italic</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('`code`', '`', '`')">Code</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('```\ncode block\n```', '```\n', '\n```')">Block</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('[link](url)', '[', '](url)')">Link</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('# ', '# ', '')">H1</button>
-        <button style="flex: unset; min-width: 0; padding: 7px 12px; font-size: 0.9em; background: #1c2e4a; color: #00eaff;" onclick="insertMarkdown('- ', '- ', '')">List</button>
+      <label for="answer">Answer (Markdown, HTML, CSS, and iFrames supported):</label>
+      
+      <div class="creation-helpers-section">
+        <h4>Content Creation Helpers</h4>
+        
+        <div class="mode-select-row">
+            <label for="output-mode-select">Preview Theme:</label>
+            <select id="output-mode-select" onchange="setMode(this.value)">
+                <option value="silvery">Silvery (Default)</option>
+                <option value="dark">Dark</option>
+                <option value="neo">Neo (High Contrast)</option>
+            </select>
+        </div>
+
+        <div class="creation-button-row">
+          <button onclick="insertMarkdown('**text**', '**', '**')">Bold</button>
+          <button onclick="insertMarkdown('`code`', '`', '`')">Code</button>
+          <button onclick="insertMarkdown('[link](url)', '[', '](url)')">Link</button>
+          <button onclick="insertMarkdown('## Heading', '## ', '')">H2</button>
+          <button onclick="insertMarkdown('- item', '- ', '')">List</button>
+          <button onclick="insertIframe()">iFrame Template</button>
+          <button onclick="removeExtraWhitespace()" style="background: #4f545c; color: white;">Cleanup Whitespace</button>
+        </div>
+        
+        <div class="module-stack-row">
+            <select id="style-select">
+                <option value="source-block">Source Material Block</option>
+                <option value="memo-block">General Memo Block</option>
+                <option value="blueprint-block">Blueprint Block</option>
+                <option value="logic-block">Logic/Code Block</option>
+                <option value="spy-ink-block">Spy Ink Block</option>
+            </select>
+            <button onclick="addBlock()">Insert Block</button>
+        </div>
+        
       </div>
 
       <textarea id="answer" placeholder="Write your truth here..."></textarea>
 
-      <label>Citations (up to 2):</label>
-      <div class="citations-container">
-        <input type="text" placeholder="Title" class="citation-title">
-        <input type="text" placeholder="URL" class="citation-url">
-        <input type="text" placeholder="Title" class="citation-title">
-        <input type="text" placeholder="URL" class="citation-url">
+      <div class="audit-fields">
+        <label for="editor">Your Name (for audit):</label>
+        <input type="text" id="editor" placeholder="admin">
+        <div style="grid-column: 1 / span 2; margin-top: 5px;">
+            <label>Citations (Title & URL):</label>
+            <div class="citations-container" style="margin-top: 0;">
+                <input type="text" placeholder="Title 1" class="citation-title">
+                <input type="text" placeholder="URL 1" class="citation-url">
+                <input type="text" placeholder="Title 2" class="citation-title">
+                <input type="text" placeholder="URL 2" class="citation-url">
+            </div>
+        </div>
       </div>
-
-      <label for="editor">Your Name (for audit):</label>
-      <input type="text" id="editor" placeholder="admin">
-
+      
       <div class="button-group">
         <button id="saveBtn">Save</button>
         <button id="copyPreviewBtn">Copy Output</button>
+        <button id="togglePreviewBtn" onclick="togglePreview()">Toggle Preview</button>
       </div>
       <div id="saveMsg" class="status-message"></div>
 
-      <label>Preview (Live Markdown):</label>
-      <div class="preview" id="preview"></div>
-      <div class="content-length" id="contentLength">Character count: 0</div>
+      <div class="preview-wrapper" id="previewWrapper">
+        <label>Preview (Live Render):</label>
+        <div class="preview" id="preview"></div>
+        <div class="content-length" id="contentLength">Character count: 0</div>
+      </div>
+      
     </div>
-
-    <div id="parser-tab" class="tab-content">
-      <div class="parser-section">
-        <div class="section-title">📋 Parse Markdown Content</div>
-        <div class="info-text">Extract structure from Markdown text. Useful for analyzing and reformatting existing content.</div>
-        <label for="parser-input">Paste Markdown/HTML Content (or content from the Answer field):</label>
-        <textarea id="parser-input" placeholder="Paste your content here..."></textarea>
-        <button onclick="parseContent()">Analyze Content</button>
-        <div id="parser-output" class="status-message" style="margin-top: 15px;"></div>
-        <pre id="parsed-structure" style="display: none;"></pre>
-      </div>
-
-      <div class="parser-section">
-        <div class="section-title">🔍 Extract from HTML</div>
-        <div class="info-text">Clean HTML blocks and extract useful text for your answer field.</div>
-        <label for="html-extract">Paste HTML Block:</label>
-        <textarea id="html-extract" placeholder="Paste HTML here..."></textarea>
-        <button onclick="extractFromHTML()">Extract Text</button>
-        <div id="extract-output" class="status-message" style="margin-top: 15px;"></div>
-        <pre id="extracted-text" style="display: none;"></pre>
-        <button class="copy-button" id="copyExtractBtn" onclick="copyExtractedText()" style="display: none;">Copy Extracted</button>
-      </div>
-
-      <div class="parser-section">
-        <div class="section-title">📐 Analyze Structure</div>
-        <div class="info-text">Get statistics and structure insights from your answer text.</div>
-        <button onclick="analyzeAnswerStructure()">Analyze Current Answer</button>
-        <pre id="structure-analysis" style="display: none;"></pre>
-      </div>
-    </div>
-
+    
     <div class="admin-footer">© 2025 truth-network admin console</div>
   </div>
 
   <script>
+    // MARKED/HIGHLIGHT CONFIG
     marked.setOptions({
       highlight: function(code, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -492,7 +589,7 @@
       }
     });
 
-    // Melody Lock Script (Kept as is)
+    // --- MELODY LOCK SCRIPT (Unchanged) ---
     const allowedMelodyHash = "e4a25ba5b1c669414746d9efdc533019e14bf8a86c288165de44bdcf791d4cfa";
     let melody = [];
     
@@ -516,24 +613,26 @@
     }
     
     function playNote(midi) {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const freq = 440 * Math.pow(2, (midi-69)/12);
-      const o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = freq;
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0.12, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.21);
-      o.connect(g).connect(ctx.destination);
-      o.start();
-      o.stop(ctx.currentTime + 0.21);
-      o.onended = ()=>ctx.close();
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const freq = 440 * Math.pow(2, (midi-69)/12);
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.12, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.21);
+        o.connect(g).connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.21);
+        o.onended = ()=>ctx.close();
+      } catch(e) {}
     }
     
     function updateMelodyBar() {
       const bar = document.getElementById('melody-bar');
       bar.innerHTML = '';
-      melody.forEach((m,i) => {
+      melody.forEach((m) => {
         const span = document.createElement('span');
         span.className = 'melody-pill';
         span.textContent = noteName(m);
@@ -568,28 +667,45 @@
     document.getElementById('importMelodyBtn').onclick = function() {
       const pat = document.getElementById('importMelodyInput').value.trim();
       if (!pat) return;
-      melody = pat.split('-').map(x=>parseInt(x,36)).filter(x=>!isNaN(x));
+      melody = pat.split('-').map(x=>parseInt(x, 36)).filter(x=>!isNaN(x)); 
       updateMelodyBar();
       document.getElementById('melody-status').textContent = '';
     };
 
     renderPiano();
 
-    // Tab switching (Modified to work outside of click event)
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      
-      const targetButton = document.querySelector(`.tabs button[onclick*="switchTab('${tabName}')"]`);
-      const targetContent = document.getElementById(tabName + '-tab');
+    // TABS (SwitchTab is now a no-op since only one tab exists)
+    function switchTab(tabName) { /* No-Op */ }
 
-      if (targetButton && targetContent) {
-        targetButton.classList.add('active');
-        targetContent.classList.add('active');
-      }
+    // --- MODE / PREVIEW TOGGLE ---
+    function setMode(mode) {
+        document.body.setAttribute('data-output-mode', mode);
+        // Force preview redraw to ensure dynamic CSS variables update
+        answerInput.dispatchEvent(new Event('input'));
     }
 
-    // Editor functionality
+    function togglePreview() {
+        const previewWrapper = document.getElementById('previewWrapper');
+        const previewEl = document.getElementById('preview');
+        const textareaEl = document.getElementById('answer');
+        const toggleBtn = document.getElementById('togglePreviewBtn');
+        
+        const isHidden = previewWrapper.style.display === 'none';
+        
+        if (isHidden) {
+            previewWrapper.style.display = 'block';
+            textareaEl.style.minHeight = '150px';
+            toggleBtn.textContent = 'Toggle Preview';
+        } else {
+            previewWrapper.style.display = 'none';
+            // Maximize textarea height when preview is hidden
+            textareaEl.style.minHeight = '350px'; 
+            toggleBtn.textContent = 'Show Preview';
+        }
+    }
+
+
+    // --- EDITOR FUNCTIONALITY ---
     const API_BASE = "https://justice.ai-n.workers.dev";
     const queryInput = document.getElementById('query');
     const answerInput = document.getElementById('answer');
@@ -604,7 +720,7 @@
 
     answerInput.addEventListener('input', () => {
       const content = answerInput.value || '';
-      previewDiv.innerHTML = marked.parse(content);
+      previewDiv.innerHTML = marked.parse(content); 
       document.querySelectorAll('#preview pre code').forEach(block => {
         hljs.highlightElement(block);
       });
@@ -644,11 +760,10 @@
         citationUrls.forEach(e => e.value = '');
         loadMsg.textContent = '';
         saveMsg.textContent = '';
-        answerInput.dispatchEvent(new Event('input')); // Update preview/count
+        answerInput.dispatchEvent(new Event('input')); 
       }
     };
 
-    // MODIFIED Load function to auto-switch tab
     loadBtn.onclick = async () => {
       loadMsg.textContent = '';
       saveMsg.textContent = '';
@@ -671,7 +786,7 @@
         const data = await resp.json();
         if (data.answer) {
           answerInput.value = data.answer;
-          answerInput.dispatchEvent(new Event('input')); // Manually trigger input to update preview
+          answerInput.dispatchEvent(new Event('input')); 
           
           if (data.citations && Array.isArray(data.citations)) {
             data.citations.slice(0,2).forEach((c, i) => {
@@ -680,10 +795,6 @@
             });
           }
           loadMsg.textContent = data.edited ? `Loaded (edited by ${data.lastEditedBy || "unknown"})` : "Loaded (AI generated)";
-
-          // **AUTOMATICALLY SWITCH to the Content Parser tab**
-          switchTab('parser'); 
-          
         } else {
           loadMsg.textContent = "No answer found. You can create one.";
         }
@@ -696,7 +807,10 @@
       saveMsg.textContent = '';
       const query = queryInput.value.trim();
       const newAnswer = answerInput.value;
+      // Persistent Editor Name: Save last-used name to local storage
       const editor = editorInput.value.trim() || "admin";
+      localStorage.setItem('lastEditorName', editor);
+      
       const citations = [];
       for (let i = 0; i < 2; ++i) {
         const title = citationTitles[i].value.trim();
@@ -707,13 +821,14 @@
         saveMsg.textContent = "Query and answer required.";
         return;
       }
-      saveMsg.textContent = "Saving...";
+      document.getElementById('saveMsg').textContent = "Saving...";
       try {
+        const truthId = "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-');
         const resp = await fetch(`${API_BASE}/api/ai/edit-truth`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            truthId: "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-'),
+            truthId: truthId,
             newText: newAnswer,
             editor,
             citations
@@ -729,116 +844,9 @@
         saveMsg.textContent = "Error saving: " + e;
       }
     };
-
-    // Parser Functions
-    function parseContent() {
-      const input = document.getElementById('parser-input').value;
-      const output = document.getElementById('parser-output');
-      const structure = document.getElementById('parsed-structure');
-      
-      if (!input.trim()) {
-        output.textContent = 'Please paste content to analyze.';
-        structure.style.display = 'none';
-        return;
-      }
-
-      const lines = input.split('\n');
-      const analysis = {
-        totalLines: lines.length,
-        totalChars: input.length,
-        headings: lines.filter(l => l.match(/^#+\s/)).length,
-        codeBlocks: (input.match(/```/g) || []).length / 2,
-        links: (input.match(/\[.*?\]\(.*?\)/g) || []).length,
-        lists: lines.filter(l => l.match(/^[-*+]\s/)).length,
-        paragraphs: lines.filter(l => l.trim().length > 0 && !l.match(/^[#\-*+`]/)).length
-      };
-
-      structure.textContent = JSON.stringify(analysis, null, 2);
-      structure.style.display = 'block';
-      output.textContent = `✓ Analysis complete: ${analysis.paragraphs} paragraphs, ${analysis.headings} headings, ${analysis.links} links`;
-    }
-
-    function extractFromHTML() {
-      const input = document.getElementById('html-extract').value;
-      const output = document.getElementById('extract-output');
-      const extracted = document.getElementById('extracted-text');
-      const copyBtn = document.getElementById('copyExtractBtn');
-
-      if (!input.trim()) {
-        output.textContent = 'Please paste HTML to extract.';
-        extracted.style.display = 'none';
-        copyBtn.style.display = 'none';
-        return;
-      }
-
-      try {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = input;
-
-        // Remove script and style tags
-        tempDiv.querySelectorAll('script, style').forEach(el => el.remove());
-
-        // Extract text content
-        let text = tempDiv.innerText || tempDiv.textContent;
-        
-        // Clean up whitespace
-        text = text.split('\n').map(l => l.trim()).filter(l => l).join('\n');
-
-        extracted.textContent = text;
-        extracted.style.display = 'block';
-        copyBtn.style.display = 'block';
-        output.textContent = `✓ Extracted ${text.length} characters`;
-      } catch (e) {
-        output.textContent = `Error parsing HTML: ${e.message}`;
-        extracted.style.display = 'none';
-        copyBtn.style.display = 'none';
-      }
-    }
-
-    function copyExtractedText() {
-      const text = document.getElementById('extracted-text').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Extracted text copied to clipboard!');
-      });
-    }
-
-    function analyzeAnswerStructure() {
-      const answer = answerInput.value;
-      const output = document.getElementById('structure-analysis');
-
-      if (!answer.trim()) {
-        output.textContent = 'No answer content to analyze.';
-        output.style.display = 'block';
-        return;
-      }
-
-      const lines = answer.split('\n');
-      const analysis = {
-        totalCharacters: answer.length,
-        totalLines: lines.length,
-        averageLineLength: Math.round(answer.length / lines.length),
-        headings: lines.filter(l => l.match(/^#+\s/)).map(l => l.trim()),
-        codeBlocks: (answer.match(/```/g) || []).length / 2,
-        links: (answer.match(/\[.*?\]\(.*?\)/g) || []),
-        lists: lines.filter(l => l.match(/^[-*+]\s/)).length,
-        readabilityScore: calculateReadability(answer)
-      };
-
-      output.textContent = JSON.stringify(analysis, null, 2);
-      output.style.display = 'block';
-    }
-
-    function calculateReadability(text) {
-      const sentences = text.split(/[.!?]+/).length;
-      const words = text.split(/\s+/).length;
-      const avgWordsPerSentence = words / sentences;
-      
-      if (avgWordsPerSentence < 15) return 'Excellent';
-      if (avgWordsPerSentence < 20) return 'Good';
-      if (avgWordsPerSentence < 25) return 'Fair';
-      return 'Dense';
-    }
-
+    
+    // --- CREATION HELPER FUNCTIONS ---
+    
     // Markdown formatting helpers
     function insertMarkdown(text, before, after) {
       const start = answerInput.selectionStart;
@@ -851,93 +859,87 @@
       answerInput.selectionStart = start + before.length;
       answerInput.selectionEnd = start + before.length + (selected || text).length;
       
-      // Trigger preview update
       answerInput.dispatchEvent(new Event('input'));
     }
-
-    // Text tools (kept but no longer assigned to buttons in the removed tab)
-    function transformCase(type) {
-      const start = answerInput.selectionStart;
-      const end = answerInput.selectionEnd;
-      const selected = answerInput.value.substring(start, end);
-
-      if (!selected) {
-        alert('Select text first');
-        return;
-      }
-
-      let transformed = selected;
-      if (type === 'upper') transformed = selected.toUpperCase();
-      else if (type === 'lower') transformed = selected.toLowerCase();
-      else if (type === 'title') {
-        transformed = selected.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-      }
-
-      answerInput.value = answerInput.value.substring(0, start) + transformed + answerInput.value.substring(end);
-      answerInput.focus();
-      answerInput.dispatchEvent(new Event('input'));
+    
+    // iFrame Template Helper
+    function insertIframe() {
+        const iframeCode = '\n' +
+        '<iframe src="https://example.com" style="border:1px solid var(--truth-accent-light); width:100%; height:300px;"></iframe>\n';
+        
+        answerInput.value += iframeCode;
+        answerInput.dispatchEvent(new Event('input'));
+        answerInput.focus();
     }
-
+    
+    // Whitespace Cleanup Helper
     function removeExtraWhitespace() {
       const content = answerInput.value;
-      const cleaned = content.split('\n').map(l => l.trim()).join('\n').replace(/\n\n\n+/g, '\n\n');
+      const cleaned = content.split('\n').map(l => l.trim()).join('\n')
+      .replace(/\n\n\n+/g, '\n\n');
+      
       answerInput.value = cleaned;
       answerInput.dispatchEvent(new Event('input'));
+      alert('Whitespace cleaned!');
     }
-
-    // Export/Import functions (kept but no longer assigned to buttons in the removed tab)
-    function exportAsJSON() {
-      const data = {
-        query: queryInput.value,
-        answer: answerInput.value,
-        editor: editorInput.value,
-        citations: [],
-        exportDate: new Date().toISOString()
-      };
-
-      for (let i = 0; i < 2; ++i) {
-        const title = citationTitles[i].value.trim();
-        const url = citationUrls[i].value.trim();
-        if (title && url) data.citations.push({ title, url });
-      }
-
-      const json = JSON.stringify(data, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `truth-${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importFromJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          queryInput.value = data.query || '';
-          answerInput.value = data.answer || '';
-          editorInput.value = data.editor || 'admin';
-          
-          if (data.citations && Array.isArray(data.citations)) {
-            data.citations.slice(0, 2).forEach((c, i) => {
-              citationTitles[i].value = c.title || '';
-              citationUrls[i].value = c.url || '';
-            });
-          }
-
-          answerInput.dispatchEvent(new Event('input'));
-          alert('✓ JSON imported successfully');
-        } catch (err) {
-          alert('Error parsing JSON: ' + err.message);
+    
+    // Module Stacker Integration (HTML/CSS blocks)
+    function addBlock() {
+        const style = document.getElementById('style-select').value;
+        let htmlSnippet = '';
+        
+        switch(style) {
+            case 'source-block':
+                htmlSnippet = 
+                '\n<div style="padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: var(--block-source-bg);">\n' +
+                '<p style="color: var(--block-text-normal); margin: 0; font-style: italic;">&gt; [Source: The key principle is modularity. Replace with quote.]</p>\n' +
+                '</div>\n';
+                break;
+            case 'memo-block':
+                htmlSnippet = 
+                '\n<div style="padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: var(--block-memo-bg); border-left: 4px solid var(--truth-accent-light);">\n' +
+                '<p style="color: var(--block-text-normal); margin: 0;">[Memo: Use this space for an important note or summary.]</p>\n' +
+                '</div>\n';
+                break;
+            case 'blueprint-block':
+                htmlSnippet = 
+                '\n<div style="padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: var(--block-blueprint-bg); border: 2px dashed var(--truth-positive);">\n' +
+                '<h4 style="color: var(--truth-positive); margin-top: 0;">Blueprint:</h4><p style="color: var(--block-text-normal);">[Drafting: Describe a technical or structural concept here.]</p>\n' +
+                '</div>\n';
+                break;
+            case 'logic-block':
+                htmlSnippet = 
+                '\n<div style="padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: var(--block-logic-bg); font-family: \'Courier New\', monospace;">\n' +
+                '<h4 style="color: var(--truth-accent-light); margin-top: 0;">Logic:</h4><pre style="color: #afeeee; white-space: pre-wrap; margin: 0;">function calculateTruth() { return true; }</pre>\n' +
+                '</div>\n';
+                break;
+            case 'spy-ink-block':
+                htmlSnippet = 
+                '\n<div style="padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: var(--block-spy-ink-bg); border: 1px dashed red;">\n' +
+                '<p style="color: #000000; margin: 0;">[Hidden: Content that should not be visible on a black background.]</p>\n' +
+                '</div>\n';
+                break;
+            default:
+                return;
         }
-      };
-      reader.readAsText(file);
+
+        answerInput.value += htmlSnippet;
+        answerInput.dispatchEvent(new Event('input'));
+        answerInput.focus();
     }
+    
+    // --- INITIALIZATION ---
+    function initializeEditor() {
+        // Load persistent editor name
+        const lastEditor = localStorage.getItem('lastEditorName');
+        if (lastEditor) {
+            editorInput.value = lastEditor;
+        }
+        // Ensure initial dispatch to load preview/count
+        answerInput.dispatchEvent(new Event('input'));
+    }
+    
+    initializeEditor();
   </script>
 </body>
 </html>
