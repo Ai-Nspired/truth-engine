@@ -1,7 +1,7 @@
 console.log('[ui.js] Loaded and executing (ESM)');
 
 // If you need events, import them as an ES module
-import { executeQuery } from './network.js';// import { Events } from '/core/events.js'; // Uncomment if neededimport { executeQuery } from './network.js';;
+import { executeQuery } from './network.js';
 import { verifyAccess } from './auth.js';
 
 // Private state
@@ -11,11 +11,6 @@ let terminalHistory = null;
 let inputElement = null;
 let isExpanded = false;
 
-const accessPhrases = {
-    master: ["funk_yeah", "i_am_dno", "hey_babes"].map(p => p.toLowerCase()),
-    admin: ["add_ming", "paid_up", "yooo"].map(p => p.toLowerCase()),
-    standard: ["level-one", "i-am-the-one", "pancakes"].map(p => p.toLowerCase())
-};
 let isVerified = false;
 let accessLevel = 'guest';
 
@@ -300,6 +295,13 @@ export function init(targetContainer) {
     if (!container) {
         console.log('[TruthEngine:UI] No container provided, deferring initialization');
         return false;
+    }
+
+    if (terminalWrapper) {
+        // Already built (e.g. reopened from the rabbit): just show it again.
+        terminalWrapper.style.display = 'flex';
+        if (inputElement) inputElement.focus();
+        return true;
     }
 
     createTerminal();

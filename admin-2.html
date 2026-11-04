@@ -282,6 +282,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <!-- Melody Lock Gate -->
@@ -412,7 +413,7 @@
     // --- End Melody Lock Script ---
 
     // --- Truth Engine Admin Logic ---
-    const API_BASE = "https://justice.ai-n.workers.dev";
+    // The API origin lives in config.js: true-admin.ai-n.org, with the worker as fallback.
     const queryInput = document.getElementById('query');
     const answerInput = document.getElementById('answer');
     const editorInput = document.getElementById('editor');
@@ -451,10 +452,10 @@
       }
       loadMsg.textContent = "Loading...";
       try {
-        const resp = await fetch(`${API_BASE}/api/ai/truth`, {
+        const resp = await window.TRUTH_ENGINE.apiFetch('/api/truth/resolve', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query })
+          body: JSON.stringify({ input: query })
         });
         const data = await resp.json();
         if (data.answer) {
@@ -463,13 +464,18 @@
           const charCount = data.answer.length;
           const contentLengthDiv = document.getElementById('contentLength');
           contentLengthDiv.textContent = `Character count: ${charCount}`;
-          if (data.citations && Array.isArray(data.citations)) {
-            data.citations.slice(0,2).forEach((c, i) => {
+          const liveCitations = (data.meta && Array.isArray(data.meta.citations))
+            ? data.meta.citations
+            : (Array.isArray(data.citations) ? data.citations : []);
+          if (liveCitations.length) {
+            liveCitations.slice(0,2).forEach((c, i) => {
               citationTitles[i].value = c.title || '';
               citationUrls[i].value = c.url || '';
             });
           }
-          loadMsg.textContent = data.edited ? `Loaded (edited by ${data.lastEditedBy || "unknown"})` : "Loaded (AI generated)";
+          loadMsg.textContent = data.layer === "master"
+            ? "Loaded MASTER truth"
+            : (data.provisional || data.layer === "provisional" ? "Loaded PROVISIONAL truth" : "Loaded (AI generated)");
         } else {
           loadMsg.textContent = "No answer found. You can create one.";
         }
@@ -495,14 +501,13 @@
       }
       saveMsg.textContent = "Saving...";
       try {
-        const resp = await fetch(`${API_BASE}/api/ai/edit-truth`, {
+        const resp = await window.TRUTH_ENGINE.apiFetch('/api/truth/provisional/update', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            truthId: "truth:" + query.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-'),
-            newText: newAnswer,
-            editor,
-            citations
+            input: query,
+            answer: newAnswer,
+            meta: { editor, citations }
           })
         });
         if (resp.ok) {

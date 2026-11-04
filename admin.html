@@ -472,6 +472,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+  <script src="config.js"></script>
 </head>
 <body data-output-mode="silvery">
   <div class="glasscard" id="melody-lock">
@@ -674,8 +675,7 @@
 
     // ========= Admin Editor Logic (wired to TRUTH worker) =========
 
-    // CHANGE THIS to your actual TRUTH orchestrator URL
-    const API_BASE = "https://truth.ai-n.workers.dev"; 
+    // The API origin lives in config.js: true-admin.ai-n.org, with the worker as fallback.
 
     const queryInput = document.getElementById('query');
     const answerInput = document.getElementById('answer');
@@ -758,7 +758,7 @@
       citationUrls.forEach(e => e.value = '');
 
       try {
-        const resp = await fetch(`${API_BASE}/api/truth/resolve`, {
+        const resp = await window.TRUTH_ENGINE.apiFetch('/api/truth/resolve', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ input })
@@ -832,7 +832,7 @@
         // Decide: if loaded from master → update master.
         // If loaded from provisional or nothing → update/create provisional.
         if (currentLayer === "master") {
-          endpoint = `${API_BASE}/api/truth/master/update`;
+          endpoint = '/api/truth/master/update';
           body = {
             input,
             answer,
@@ -843,9 +843,9 @@
           };
         } else {
           // provisional create-or-update
-          endpoint = `${API_BASE}/api/truth/provisional/update`;
+          endpoint = '/api/truth/provisional/update';
           body = {
-            idOrQuery: input,
+            input,
             answer,
             meta: {
               editor,
@@ -854,7 +854,7 @@
           };
         }
 
-        const resp = await fetch(endpoint, {
+        const resp = await window.TRUTH_ENGINE.apiFetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)

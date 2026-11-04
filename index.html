@@ -152,6 +152,7 @@
     }
   </style>
  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <header class="site-header-new">
@@ -198,10 +199,11 @@
   </footer>
   <a href="admin.html" style="position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none;">Admin</a>
   <script>
+    // The rabbit opens the admin console hosted at true-admin.ai-n.org
     document.getElementById('white-rabbit').addEventListener('click', function(e) {
       e.preventDefault();
-      // Assuming your editor is now correctly named admin.html
-      window.open('admin.html', '_blank');
+      const cfg = window.TRUTH_ENGINE;
+      window.open((cfg && cfg.adminUrl) || 'https://true-admin.ai-n.org/admin', '_blank');
     });
   </script>
 </body>
