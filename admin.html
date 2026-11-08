@@ -535,6 +535,8 @@
       <div class="button-group">
         <button id="saveBtn">Save</button>
         <button id="copyPreviewBtn">Copy Output</button>
+        <button id="archiveBtn">Download Archive</button>
+        <button id="restoreBtn">Restore Archived</button>
         <button id="togglePreviewBtn" onclick="togglePreview()">Toggle Preview</button>
       </div>
       <div id="saveMsg" class="status-message"></div>
@@ -692,6 +694,11 @@
     let currentLayer = null;    // "master" | "provisional" | null
     let currentId = null;       // normalized id
 
+    // Durability: everything the editor loads is archived locally and can be
+    // written back, so KV expiry cannot silently take knowledge with it.
+    const ARCHIVE_PREFIX = 'truth-archive:';
+    let lastLoaded = null;
+
     answerInput.addEventListener('input', () => {
       const content = answerInput.value || '';
       previewDiv.innerHTML = marked.parse(content);
@@ -769,6 +776,9 @@
           return;
         }
 
+        lastLoaded = data;
+        archiveSave(data);
+
         if (data.answer) {
           answerInput.value = data.answer;
           answerInput.dispatchEvent(new Event('input'));
@@ -837,9 +847,9 @@
             input,
             answer,
             editor,
-            meta: {
+            meta: Object.assign({}, loadedMeta(), {
               citations
-            }
+            })
           };
         } else {
           // provisional create-or-update
@@ -847,10 +857,10 @@
           body = {
             input,
             answer,
-            meta: {
+            meta: Object.assign({}, loadedMeta(), {
               editor,
               citations
-            }
+            })
           };
         }
 
@@ -881,6 +891,80 @@
     };
 
     // Markdown helpers (unchanged from your version)
+    // ---- Durability: archive on load, write back on demand ----
+    function loadedMeta() {
+      return (lastLoaded && lastLoaded.meta) ? Object.assign({}, lastLoaded.meta) : {};
+    }
+
+    function archiveKey(rec) {
+      const slug = rec.id || String(rec.query || '').toLowerCase().replace(/\s+/g, '-');
+      return ARCHIVE_PREFIX + (slug || String(Date.now()));
+    }
+
+    function archiveSave(rec) {
+      if (!rec) return;
+      try {
+        localStorage.setItem(archiveKey(rec), JSON.stringify({ savedAt: Date.now(), record: rec }));
+      } catch (e) { /* storage unavailable */ }
+    }
+
+    function archiveEntries() {
+      const out = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf(ARCHIVE_PREFIX) === 0) {
+          try { out.push(JSON.parse(localStorage.getItem(k))); } catch (e) {}
+        }
+      }
+      return out.sort((a, b) => (a.savedAt || 0) - (b.savedAt || 0));
+    }
+
+    document.getElementById('archiveBtn').onclick = () => {
+      const entries = archiveEntries();
+      if (!entries.length) {
+        saveMsg.textContent = "Nothing archived yet - load a record first.";
+        return;
+      }
+      const blob = new Blob([JSON.stringify({ exported: new Date().toISOString(), entries }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'truth-archive-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      saveMsg.textContent = `Exported ${entries.length} archived record(s).`;
+    };
+
+    document.getElementById('restoreBtn').onclick = async () => {
+      const entries = archiveEntries();
+      if (!entries.length) {
+        saveMsg.textContent = "Nothing archived to restore.";
+        return;
+      }
+      saveMsg.textContent = `Re-saving ${entries.length} archived record(s)...`;
+      let ok = 0, failed = 0;
+      for (const entry of entries) {
+        const rec = entry.record || {};
+        const input = rec.query || rec.id;
+        if (!input || !rec.answer) { failed++; continue; }
+        try {
+          const resp = await window.TRUTH_ENGINE.apiFetch(
+            rec.layer === 'master' ? '/api/truth/master/update' : '/api/truth/provisional/update',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                input,
+                answer: rec.answer,
+                meta: Object.assign({}, rec.meta || {}, { editor: (editorInput.value.trim() || 'restore') })
+              })
+            }
+          );
+          if (resp.ok) { ok++; } else { failed++; }
+        } catch (e) { failed++; }
+      }
+      saveMsg.textContent = `Restored ${ok} record(s)` + (failed ? `, ${failed} failed` : '') + '.';
+    };
+
     function insertMarkdown(text, before, after) {
       const start = answerInput.selectionStart;
       const end = answerInput.selectionEnd;
